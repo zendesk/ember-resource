@@ -1,4 +1,4 @@
-(function(exports) {
+(function (exports) {
 
   var expandSchema, expandSchemaItem, createSchemaProperties,
       mergeSchemas;
@@ -13,7 +13,7 @@
     return obj === Object(obj);
   }
 
-  Ember.Resource.deepSet = function(obj, path, value) {
+  Ember.Resource.deepSet = function (obj, path, value) {
     if (Ember.typeOf(path) === 'string') {
       Ember.Resource.deepSet(obj, path.split('.'), value);
       return;
@@ -37,7 +37,7 @@
     }
   };
 
-  Ember.Resource.deepMerge = function(objA, objB) {
+  Ember.Resource.deepMerge = function (objA, objB) {
     var oldValue, newValue;
 
     for (var key in objB) {
@@ -62,21 +62,21 @@
     getValue: Ember.required(Function),
     setValue: Ember.required(Function),
 
-    dependencies: Ember.computed('path', function() {
+    dependencies: Ember.computed('path', function () {
       var deps = ['data.' + this.get('path')];
 
-      if(Ember.Resource.SUPPORT_AUTOFETCH) {
+      if (Ember.Resource.SUPPORT_AUTOFETCH) {
         deps.push('isExpired');
       }
 
       return deps;
     }).cacheable(),
 
-    data: function(instance) {
+    data: function (instance) {
       return Ember.get(instance, 'data');
     },
 
-    type: Ember.computed('theType', function() {
+    type: Ember.computed('theType', function () {
       var type = this.get('theType');
       if (isString(type)) {
         type = Ember.getPath(type);
@@ -89,7 +89,7 @@
       return type;
     }).cacheable(),
 
-    propertyFunction: function(name, value) {
+    propertyFunction: function (name, value) {
       var schemaItem = this.constructor.schema[name];
       if (arguments.length === 2) {
         this.resourcePropertyWillChange(name, value);
@@ -105,17 +105,17 @@
       return value;
     },
 
-    property: function() {
+    property: function () {
       var cp = new Ember.ComputedProperty(this.propertyFunction);
       return cp.property.apply(cp, this.get('dependencies')).cacheable();
     },
 
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       return undefined;
     }
   });
   Ember.Resource.AbstractSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var instance = this._super.apply(this);
       instance.set('name', name);
       return instance;
@@ -126,7 +126,7 @@
   Ember.Resource.SchemaItem = Ember.Resource.AbstractSchemaItem.extend({});
 
   Ember.Resource.SchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
 
       if (definition instanceof Ember.Resource.AbstractSchemaItem) { return definition; }
@@ -137,14 +137,14 @@
         schema[name] = definition;
       }
 
-      if(isObject(definition)) {
+      if (isObject(definition)) {
         type = definition.type;
       }
 
       if (type) {
         if (type.isEmberResource || Ember.typeOf(type) === 'string') { // a has-one association
           return Ember.Resource.HasOneSchemaItem.create(name, schema);
-        } else if(type.isEmberResourceCollection) { // a has-many association
+        } else if (type.isEmberResourceCollection) { // a has-many association
           return Ember.Resource.HasManySchemaItem.create(name, schema);
         } else { // a regular attribute
           return Ember.Resource.AttributeSchemaItem.create(name, schema);
@@ -158,7 +158,7 @@
     theType: Object,
     path: Ember.required(String),
 
-    getValue: function(instance) {
+    getValue: function (instance) {
       var value;
       var data = this.data(instance);
       if (data) {
@@ -172,7 +172,7 @@
       return value;
     },
 
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
       var data = this.data(instance);
       if (!data) return;
 
@@ -185,31 +185,31 @@
       Ember.Resource.deepSet(data, this.get('path'), value);
     },
 
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       return Ember.get(instance, this.name);
     }
   });
 
   Ember.Resource.AttributeSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       var instance;
 
       if (this === Ember.Resource.AttributeSchemaItem) {
         switch (definition.type) {
-          case Number:
-            return Ember.Resource.NumberAttributeSchemaItem.create(name, schema);
-          case String:
-            return Ember.Resource.StringAttributeSchemaItem.create(name, schema);
-          case Boolean:
-            return Ember.Resource.BooleanAttributeSchemaItem.create(name, schema);
-          case Date:
-            return Ember.Resource.DateAttributeSchemaItem.create(name, schema);
-          default:
-            instance = this._super.apply(this, arguments);
-            instance.set('fetchable', name !== 'id');
-            instance.set('path', definition.path || name);
-            return instance;
+        case Number:
+          return Ember.Resource.NumberAttributeSchemaItem.create(name, schema);
+        case String:
+          return Ember.Resource.StringAttributeSchemaItem.create(name, schema);
+        case Boolean:
+          return Ember.Resource.BooleanAttributeSchemaItem.create(name, schema);
+        case Date:
+          return Ember.Resource.DateAttributeSchemaItem.create(name, schema);
+        default:
+          instance = this._super.apply(this, arguments);
+          instance.set('fetchable', name !== 'id');
+          instance.set('path', definition.path || name);
+          return instance;
         }
       }
       else {
@@ -223,7 +223,7 @@
 
   Ember.Resource.NumberAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: Number,
-    typeCast: function(value) {
+    typeCast: function (value) {
       if (isNaN(value)) {
         value = undefined;
       }
@@ -238,7 +238,7 @@
 
   Ember.Resource.StringAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: String,
-    typeCast: function(value) {
+    typeCast: function (value) {
       if (value === undefined || value === null || Ember.typeOf(value) === 'string') {
         return value;
       } else {
@@ -249,7 +249,7 @@
 
   Ember.Resource.BooleanAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: Boolean,
-    typeCast: function(value) {
+    typeCast: function (value) {
       if (value === undefined || value === null || Ember.typeOf(value) === 'boolean') {
         return value;
       } else {
@@ -260,14 +260,14 @@
 
   Ember.Resource.DateAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: Date,
-    typeCast: function(value) {
+    typeCast: function (value) {
       if (value === undefined || value === null || Ember.typeOf(value) === 'date') {
         return value;
       } else {
         return new Date(value);
       }
     },
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       var value = Ember.get(instance, this.name);
       return value ? value.toJSON() : value;
     }
@@ -277,7 +277,7 @@
     fetchable: true
   });
   Ember.Resource.HasOneSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       if (this === Ember.Resource.HasOneSchemaItem) {
         if (definition.nested) {
@@ -298,7 +298,7 @@
   });
 
   Ember.Resource.HasOneNestedSchemaItem = Ember.Resource.HasOneSchemaItem.extend({
-    getValue: function(instance) {
+    getValue: function (instance) {
       var data = this.data(instance);
       if (!data) return;
       var type = this.get('type');
@@ -310,7 +310,7 @@
       return value;
     },
 
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
       var data = this.data(instance);
       if (!data) return;
 
@@ -321,13 +321,13 @@
       Ember.Resource.deepSet(data, this.get('path'), value);
     },
 
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       var value = Ember.get(instance, this.name);
       return value ? value.toJSON() : value;
     }
   });
   Ember.Resource.HasOneNestedSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       var instance = this._super.apply(this, arguments);
       instance.set('path', definition.path || name);
@@ -344,15 +344,15 @@
   Ember.Resource.HasOneNestedIdSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
     fetchable: true,
     theType: Number,
-    getValue: function(instance) {
+    getValue: function (instance) {
       return instance.getPath(this.get('path'));
     },
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
       Ember.set(instance, this.getPath('association.name'), {id: value});
     }
   });
   Ember.Resource.HasOneNestedIdSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       var instance = this._super.apply(this, arguments);
       instance.set('association', definition.association);
@@ -363,7 +363,7 @@
 
 
   Ember.Resource.HasOneRemoteSchemaItem = Ember.Resource.HasOneSchemaItem.extend({
-    getValue: function(instance) {
+    getValue: function (instance) {
       var data = this.data(instance);
       if (!data) return;
       var id = Ember.getPath(data, this.get('path'));
@@ -372,7 +372,7 @@
       }
     },
 
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
       var data = this.data(instance);
       if (!data) return;
       var id = Ember.get(value || {}, 'id');
@@ -380,7 +380,7 @@
     }
   });
   Ember.Resource.HasOneRemoteSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       var instance = this._super.apply(this, arguments);
       var path = definition.path || name + '_id';
@@ -397,7 +397,7 @@
 
 
   Ember.Resource.HasManySchemaItem = Ember.Resource.AbstractSchemaItem.extend({
-    itemType: Ember.computed('theItemType', function() {
+    itemType: Ember.computed('theItemType', function () {
       var type = this.get('theItemType');
       if (isString(type)) {
         type = Ember.getPath(type);
@@ -412,7 +412,7 @@
   });
 
   Ember.Resource.HasManySchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
       if (this === Ember.Resource.HasManySchemaItem) {
         if (definition.url) {
@@ -437,7 +437,7 @@
   Ember.Resource.HasManyRemoteSchemaItem = Ember.Resource.HasManySchemaItem.extend({
     fetchable: false,
     dependencies: ['id', 'isInitializing'],
-    getValue: function(instance) {
+    getValue: function (instance) {
       if (Ember.get(instance, 'isInitializing')) return;
 
       var options = {
@@ -456,12 +456,12 @@
       return this.get('type').create(options);
     },
 
-    setValue: function(instance, value) {
-      throw('you can not set a remote has many association');
+    setValue: function (instance, value) {
+      throw ('you can not set a remote has many association');
     }
   });
   Ember.Resource.HasManyRemoteSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
 
       var instance = this._super.apply(this, arguments);
@@ -469,7 +469,7 @@
       if (Ember.typeOf(definition.url) === 'function') {
         instance.url = definition.url;
       } else {
-        instance.url = function(obj) {
+        instance.url = function (obj) {
           var id = obj.get('id');
           if (id) {
             return definition.url.fmt(id);
@@ -483,7 +483,7 @@
 
   Ember.Resource.HasManyNestedSchemaItem = Ember.Resource.HasManySchemaItem.extend({
     fetchable: true,
-    getValue: function(instance) {
+    getValue: function (instance) {
       var data = this.data(instance);
       if (!data) return;
       data = Ember.getPath(data, this.get('path'));
@@ -500,16 +500,16 @@
       return this.get('type').create(options);
     },
 
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
     },
 
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       var value = Ember.get(instance, this.name);
       return value ? value.toJSON() : value;
     }
   });
   Ember.Resource.HasManyNestedSchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
 
       var instance = this._super.apply(this, arguments);
@@ -521,7 +521,7 @@
 
   Ember.Resource.HasManyInArraySchemaItem = Ember.Resource.HasManySchemaItem.extend({
     fetchable: true,
-    getValue: function(instance) {
+    getValue: function (instance) {
       var data = this.data(instance);
       if (!data) return;
       data = Ember.getPath(data, this.get('path'));
@@ -530,20 +530,20 @@
 
       return this.get('type').create({
         type: this.get('itemType'),
-        content: data.map(function(id) { return {id: id}; })
+        content: data.map(function (id) { return {id: id}; })
       });
     },
 
-    setValue: function(instance, value) {
+    setValue: function (instance, value) {
     },
 
-    toJSON: function(instance) {
+    toJSON: function (instance) {
       var value = Ember.get(instance, this.name);
       return value ? value.mapProperty('id') : value;
     }
   });
   Ember.Resource.HasManyInArraySchemaItem.reopenClass({
-    create: function(name, schema) {
+    create: function (name, schema) {
       var definition = schema[name];
 
       var instance = this._super.apply(this, arguments);
@@ -566,21 +566,21 @@
   //       resource; // another way to reference the resource object
   //     }
   //
-  var errorHandlerWithContext = function(errorHandler, context) {
-    return function() {
+  var errorHandlerWithContext = function (errorHandler, context) {
+    return function () {
       var args = Array.prototype.slice.call(arguments, 0);
       args.push(context);
       errorHandler.apply(context, args);
     };
   };
 
-  Ember.Resource.ajax = function(options) {
+  Ember.Resource.ajax = function (options) {
     options.dataType = options.dataType || 'json';
     options.type     = options.type     || 'GET';
 
-    if(options.error) {
+    if (options.error) {
       options.error = errorHandlerWithContext(options.error, options);
-    } else if(Ember.Resource.errorHandler) {
+    } else if (Ember.Resource.errorHandler) {
       options.error = errorHandlerWithContext(Ember.Resource.errorHandler, options);
     }
 
@@ -601,16 +601,16 @@
     clock: Ember.Object.create({
       now: new Date(),
 
-      tick: function() {
+      tick: function () {
         Ember.Resource.Lifecycle.clock.set('now', new Date());
       },
 
-      start: function() {
+      start: function () {
         this.stop();
         Ember.Resource.Lifecycle.clock.set('timer', setInterval(Ember.Resource.Lifecycle.clock.tick, 10000));
       },
 
-      stop: function() {
+      stop: function () {
         var timer = Ember.Resource.Lifecycle.clock.get('timer');
         if (timer) {
           clearInterval(timer);
@@ -619,7 +619,7 @@
     }),
 
     classMixin: Ember.Mixin.create({
-      create: function(options, data) {
+      create: function (options, data) {
         options = options || {};
         options.resourceState = Ember.Resource.Lifecycle.INITIALIZING;
 
@@ -638,69 +638,69 @@
       resourceState: 0,
       autoFetch: true,
 
-      init: function() {
+      init: function () {
         this._super.apply(this, arguments);
 
         var self = this;
 
-        if(!Ember.Resource.SUPPORT_AUTOFETCH) {
+        if (!Ember.Resource.SUPPORT_AUTOFETCH) {
           this.set('autoFetch', false);
         }
 
-        var updateExpiry = function() {
+        var updateExpiry = function () {
           var expireAt = new Date();
           expireAt.setSeconds(expireAt.getSeconds() + Ember.get(self, 'expireIn'));
           Ember.set(self, 'expireAt', expireAt);
         };
 
-        Ember.addListener(this, 'willFetch', this, function() {
+        Ember.addListener(this, 'willFetch', this, function () {
           Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHING);
           updateExpiry();
         });
 
-        Ember.addListener(this, 'didFetch', this, function() {
+        Ember.addListener(this, 'didFetch', this, function () {
           Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
           updateExpiry();
         });
 
-        Ember.addListener(this, 'didFail', this, function() {
+        Ember.addListener(this, 'didFail', this, function () {
           Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
           updateExpiry();
         });
 
         var resourceStateBeforeSave;
-        Ember.addListener(this, 'willSave', this, function() {
+        Ember.addListener(this, 'willSave', this, function () {
           resourceStateBeforeSave = Ember.get(self, 'resourceState');
           Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.SAVING);
         });
 
-        Ember.addListener(this, 'didSave', this, function() {
+        Ember.addListener(this, 'didSave', this, function () {
           Ember.set(self, 'resourceState', resourceStateBeforeSave || Ember.Resource.Lifecycle.UNFETCHED);
         });
       },
 
-      isFetchable: Ember.computed('resourceState', function() {
+      isFetchable: Ember.computed('resourceState', function () {
         var state = Ember.get(this, 'resourceState');
         return state == Ember.Resource.Lifecycle.UNFETCHED || state === Ember.Resource.Lifecycle.EXPIRED;
       }).cacheable(),
 
-      isAutoFetchable: Ember.computed('isFetchable', 'autoFetch', function() {
+      isAutoFetchable: Ember.computed('isFetchable', 'autoFetch', function () {
         return this.get('isFetchable') && this.get('autoFetch');
       }).cacheable(),
 
-      isInitializing: Ember.computed('resourceState', function() {
+      isInitializing: Ember.computed('resourceState', function () {
         return (Ember.get(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
       }).cacheable(),
 
-      isFetching: Ember.computed('resourceState', function() {
+      isFetching: Ember.computed('resourceState', function () {
         return (Ember.get(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHING;
       }).cacheable(),
 
-      isFetched: Ember.computed('resourceState', function() {
+      isFetched: Ember.computed('resourceState', function () {
         return (Ember.get(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
       }).cacheable(),
 
-      isSavable: Ember.computed('resourceState', function() {
+      isSavable: Ember.computed('resourceState', function () {
         var state = Ember.get(this, 'resourceState');
         var unsavableState = [
           Ember.Resource.Lifecycle.INITIALIZING,
@@ -712,24 +712,24 @@
         return state && !unsavableState.contains(state);
       }).cacheable(),
 
-      isSaving: Ember.computed('resourceState', function() {
+      isSaving: Ember.computed('resourceState', function () {
         return (Ember.get(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
       }).cacheable(),
 
-      scheduleFetch: function() {
+      scheduleFetch: function () {
         if (Ember.get(this, 'isAutoFetchable')) {
           Ember.run.next(this, this.fetch);
         }
       },
 
-      expire: function() {
-        Ember.run.next(this, function() {
+      expire: function () {
+        Ember.run.next(this, function () {
           Ember.set(this, 'expireAt', new Date());
           Ember.Resource.Lifecycle.clock.tick();
         });
       },
 
-      updateIsExpired: Ember.observer(function() {
+      updateIsExpired: Ember.observer(function () {
         var isExpired = Ember.get(this, 'resourceState') === Ember.Resource.Lifecycle.EXPIRED;
         if (isExpired) return true;
 
@@ -741,13 +741,13 @@
 
         var oldIsExpired = Ember.get(this, 'isExpired');
 
-        if (( isExpired && !oldIsExpired ) ||
-            ( (isExpired === false) && oldIsExpired)) {
+        if ((isExpired && !oldIsExpired) ||
+            ((isExpired === false) && oldIsExpired)) {
           Ember.set(this, 'isExpired', isExpired);
         }
       }, 'Ember.Resource.Lifecycle.clock.now', 'expireAt', 'resourceState'),
 
-      isExpired: Ember.computed(function(name, value) {
+      isExpired: Ember.computed(function (name, value) {
         if (value) {
           Ember.set(this, 'resourceState', Ember.Resource.Lifecycle.EXPIRED);
         }
@@ -760,27 +760,27 @@
   Ember.Resource.reopen({
     isEmberResource: true,
 
-    updateWithApiData: function(json) {
+    updateWithApiData: function (json) {
       var data = Ember.get(this, 'data');
       Ember.beginPropertyChanges(data);
       Ember.Resource.deepMerge(data, this.constructor.parse(json));
       Ember.endPropertyChanges(data);
     },
 
-    willFetch: function() {},
-    didFetch: function() {},
-    willSave: function() {},
-    didSave: function() {},
-    didFail: function() {},
+    willFetch: function () {},
+    didFetch: function () {},
+    willSave: function () {},
+    didSave: function () {},
+    didFail: function () {},
 
-    fetched: function() {
-      if(!this._fetchDfd) {
+    fetched: function () {
+      if (!this._fetchDfd) {
         this._fetchDfd = $.Deferred();
       }
       return this._fetchDfd;
     },
 
-    fetch: function(ajaxOptions) {
+    fetch: function (ajaxOptions) {
       var sideloads;
       if (!Ember.get(this, 'isFetchable')) return $.when();
 
@@ -803,40 +803,40 @@
 
       sideloads = this.constructor.sideloads;
 
-      if(sideloads && sideloads.length !== 0) {
+      if (sideloads && sideloads.length !== 0) {
         ajaxOptions.data = {include: sideloads.join(",")};
       }
 
-      this.deferedFetch = Ember.Resource.ajax(ajaxOptions).done(function(json) {
+      this.deferedFetch = Ember.Resource.ajax(ajaxOptions).done(function (json) {
         self.updateWithApiData(json);
       });
 
-      this.deferedFetch.fail(function() {
+      this.deferedFetch.fail(function () {
         self.didFail.call(self);
         Ember.sendEvent(self, 'didFail');
         self.fetched().reject();
       });
 
-      this.deferedFetch.done(function() {
+      this.deferedFetch.done(function () {
         self.didFetch.call(self);
         Ember.sendEvent(self, 'didFetch');
         self.fetched().resolve();
       });
 
-      this.deferedFetch.always(function() {
+      this.deferedFetch.always(function () {
         self.deferedFetch = null;
       });
 
       return this.deferedFetch;
     },
 
-    resourceURL: function() {
+    resourceURL: function () {
       return this.constructor.resourceURL(this);
     },
 
     // Turn this resource into a JSON object to be saved via AJAX. Override
     // this method to produce different syncing behavior.
-    toJSON: function() {
+    toJSON: function () {
       var json = {};
       var schemaItem, path, value;
       for (var name in this.constructor.schema) {
@@ -855,11 +855,11 @@
       return json;
     },
 
-    isNew: Ember.computed('id', function() {
+    isNew: Ember.computed('id', function () {
       return !Ember.get(this, 'id');
     }).cacheable(),
 
-    save: function(options) {
+    save: function (options) {
       options = options || {};
       if (!Ember.get(this, 'isSavable')) return false;
 
@@ -886,7 +886,7 @@
 
       var deferedSave = Ember.Resource.ajax(ajaxOptions);
 
-      deferedSave.done(function(data, status, response) {
+      deferedSave.done(function (data, status, response) {
         var location = response.getResponseHeader('Location');
         if (location) {
           var id = self.constructor.idFromURL(location);
@@ -900,7 +900,7 @@
         }
       });
 
-      deferedSave.always(function() {
+      deferedSave.always(function () {
         self.didSave.call(self);
         Ember.sendEvent(self, 'didSave');
       });
@@ -908,14 +908,14 @@
       return deferedSave;
     },
 
-    destroy: function() {
-      if(this.get('id')) {
+    destroy: function () {
+      if (this.get('id')) {
         this.constructor.identityMap.remove(this.get('id'));
       }
       this._super();
     },
 
-    destroyResource: function() {
+    destroyResource: function () {
       var previousState = Ember.get(this, 'resourceState'), self = this;
       Ember.set(this, 'resourceState', Ember.Resource.Lifecycle.DESTROYING);
       return Ember.Resource.ajax({
@@ -923,16 +923,16 @@
         operation: 'destroy',
         url:  this.resourceURL(),
         resource: this
-      }).done(function() {
+      }).done(function () {
         Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.DESTROYED);
         self.destroy();
-      }).fail(function() {
+      }).fail(function () {
         Ember.set(self, 'resourceState', previousState);
       });
     }
   }, Ember.Resource.Lifecycle.prototypeMixin);
 
-  expandSchema = function(schema) {
+  expandSchema = function (schema) {
     for (var name in schema) {
       if (schema.hasOwnProperty(name)) {
         schema[name] = Ember.Resource.SchemaItem.create(name, schema);
@@ -942,13 +942,13 @@
     return schema;
   };
 
-  mergeSchemas = function(childSchema, parentSchema) {
+  mergeSchemas = function (childSchema, parentSchema) {
     var schema = Ember.copy(parentSchema || {});
 
     for (var name in childSchema) {
       if (childSchema.hasOwnProperty(name)) {
         if (schema.hasOwnProperty(name)) {
-          throw("Schema item '" + name + "' is already defined");
+          throw ("Schema item '" + name + "' is already defined");
         }
 
         schema[name] = childSchema[name];
@@ -958,7 +958,7 @@
     return schema;
   };
 
-  createSchemaProperties = function(schema) {
+  createSchemaProperties = function (schema) {
     var properties = {}, schemaItem;
 
     for (var propertyName in schema) {
@@ -974,7 +974,7 @@
     isEmberResource: true,
     schema: {},
 
-    baseClass: function() {
+    baseClass: function () {
       if (this === Ember.Resource) {
         return null;
       } else {
@@ -982,14 +982,14 @@
       }
     },
 
-    subclassFor: function(options, data) {
+    subclassFor: function (options, data) {
       return this;
     },
 
     // Create an instance of this resource. If `options` includes an
     // `id`, first check the identity map and return the existing resource
     // with that ID if found.
-    create: function(options, data) {
+    create: function (options, data) {
       data    = data    || {};
       options = options || {};
 
@@ -1047,7 +1047,7 @@
     // Parse JSON -- likely returned from an AJAX call -- into the
     // properties for an instance of this resource. Override this method
     // to produce different parsing behavior.
-    parse: function(json) {
+    parse: function (json) {
       return json;
     },
 
@@ -1063,7 +1063,7 @@
     //  * `parse` -- the function used to parse JSON returned from AJAX
     //    calls into the resource properties. By default, simply returns
     //    the JSON.
-    define: function(options) {
+    define: function (options) {
       options = options || {};
       var schema = expandSchema(options.schema);
       schema = mergeSchemas(schema, this.schema);
@@ -1090,7 +1090,7 @@
         classOptions.identityMapLimit = options.identityMapLimit;
       }
 
-      if(options.sideloads) {
+      if (options.sideloads) {
         classOptions.sideloads = options.sideloads;
       }
 
@@ -1099,13 +1099,13 @@
       return klass;
     },
 
-    resourceURL: function(instance) {
+    resourceURL: function (instance) {
       if (Ember.typeOf(this.url) == 'function') {
         return this.url(instance);
       } else if (this.url) {
         if (instance) {
           var id = Ember.get(instance, 'id');
-          if(!id) {
+          if (!id) {
             return this.url;
           }
 
@@ -1118,7 +1118,7 @@
       }
     },
 
-    idFromURL: function(url) {
+    idFromURL: function (url) {
       var regex;
       if (!this.schema.id) return;
 
@@ -1139,14 +1139,14 @@
     isEmberResourceCollection: true,
     type: Ember.required(),
 
-    fetched: function() {
-      if(!this._fetchDfd) {
+    fetched: function () {
+      if (!this._fetchDfd) {
         this._fetchDfd = $.Deferred();
       }
       return this._fetchDfd;
     },
 
-    fetch: function(ajaxOptions) {
+    fetch: function (ajaxOptions) {
       if (!Ember.get(this, 'isFetchable') || Ember.get(this, 'prePopulated')) return $.when();
 
       var self = this;
@@ -1155,24 +1155,24 @@
 
       Ember.sendEvent(self, 'willFetch');
 
-      this.deferedFetch = this._fetch(function(json) {
+      this.deferedFetch = this._fetch(function (json) {
         Ember.set(self, 'content', self.parse(json));
       }, ajaxOptions);
 
-      this.deferedFetch.always(function() {
+      this.deferedFetch.always(function () {
         Ember.sendEvent(self, 'didFetch');
         self.fetched().resolve();
         self.deferredFetch = null;
       });
       return this.deferedFetch;
     },
-    _resolveType: function() {
+    _resolveType: function () {
       if (isString(this.type)) {
         var type = Ember.getPath(this.type);
         if (type) this.type = type;
       }
     },
-    _fetch: function(callback, ajaxOptions) {
+    _fetch: function (callback, ajaxOptions) {
       this._resolveType();
       ajaxOptions = $.extend({}, ajaxOptions, {
         url: this.resolveUrl(),
@@ -1182,12 +1182,12 @@
       });
       return Ember.Resource.ajax(ajaxOptions);
     },
-    resolveUrl: function() {
+    resolveUrl: function () {
       return this.get('url') || this.type.resourceURL();
     },
-    instantiateItems: function(items) {
+    instantiateItems: function (items) {
       this._resolveType();
-      return items.map(function(item) {
+      return items.map(function (item) {
         if (item instanceof this.type) {
           return item;
         } else {
@@ -1195,7 +1195,7 @@
         }
       }, this);
     },
-    parse: function(json) {
+    parse: function (json) {
       this._resolveType();
       if (Ember.typeOf(this.type.parse) == 'function') {
         return json.map(this.type.parse);
@@ -1205,27 +1205,27 @@
       }
     },
 
-    length: Ember.computed('content.length', 'resourceState', 'isExpired', function() {
+    length: Ember.computed('content.length', 'resourceState', 'isExpired', function () {
       var content = Ember.get(this, 'content');
       var length = content ? Ember.get(content, 'length') : 0;
       if (length === 0 ||  Ember.get(this, 'isExpired'))  this.scheduleFetch();
       return length;
     }).cacheable(),
 
-    content: Ember.computed(function(name, value) {
+    content: Ember.computed(function (name, value) {
       if (arguments.length === 2) { // setter
         return this.instantiateItems(value);
       }
     }).cacheable(),
 
-    autoFetchOnExpiry: Ember.observer(function() {
+    autoFetchOnExpiry: Ember.observer(function () {
       if (Ember.get(this, 'isAutoFetchable') && Ember.get(this, 'isExpired') && Ember.get(this, 'hasArrayObservers')) {
         this.fetch();
       }
     }, 'isExpired', 'hasArrayObservers'),
 
-    toJSON: function() {
-      return this.map(function(item) {
+    toJSON: function () {
+      return this.map(function (item) {
         return item.toJSON();
       });
     }
@@ -1234,7 +1234,7 @@
   Ember.ResourceCollection.reopenClass({
     isEmberResourceCollection: true,
     identityMapLimit: Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT * 5,
-    create: function(options) {
+    create: function (options) {
       options = options || {};
       var content = options.content;
       delete options.content;

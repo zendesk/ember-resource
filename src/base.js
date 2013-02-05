@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
   window.Ember = window.Ember || window.SC;
 

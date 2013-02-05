@@ -1,0 +1,7 @@
+{
+  "name": "ember-resource",
+  "version": "1.0.0",
+  "devDependencies": {
+    "jshint": "0.9.1"
+  }
+}

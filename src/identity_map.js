@@ -1,30 +1,32 @@
-(function() {
-  Ember.Resource.IdentityMap = function(limit) {
+/*globals Ember, LRUCache*/
+
+(function () {
+  Ember.Resource.IdentityMap = function (limit) {
     this.cache = new LRUCache(limit || Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT);
   };
 
   Ember.Resource.IdentityMap.prototype = {
-    get: function() {
+    get: function () {
       return LRUCache.prototype.get.apply(this.cache, arguments);
     },
 
-    put: function() {
+    put: function () {
       return LRUCache.prototype.put.apply(this.cache, arguments);
     },
 
-    remove: function() {
+    remove: function () {
       return LRUCache.prototype.remove.apply(this.cache, arguments);
     },
 
-    clear: function() {
+    clear: function () {
       return LRUCache.prototype.removeAll.apply(this.cache, arguments);
     },
 
-    size: function() {
+    size: function () {
       return this.cache.size;
     },
 
-    limit: function() {
+    limit: function () {
       return this.cache.limit;
     }
 
