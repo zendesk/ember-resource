@@ -2,6 +2,19 @@
 
 A simple library to connect your Ember.js application to JSON backends.
 
+## Ember Resource 2.0
+
+We're big fans of semantic versioning. Unfortunately Ember Resource has not
+shipped a proper release yet :( Even so, we realize that Ember Resource is
+being used out in the wild. So, what to do?
+
+We're following in the footsteps of the Rails project and the Ember project and
+creating a `1-0-stable` branch. Ember Resource in its current form will live
+on in the `1-0-stable` branch.
+
+Henceforth, the `master` branch of Ember Resource will undergo breaking API
+changes, and thus, will eventually be named Ember Resource 2.0.
+
 ## The Mandatory Todo Appplication
 
 I've created a modified version of the todo application that the Ember.js Tutorial walks you through.
