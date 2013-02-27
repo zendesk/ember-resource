@@ -762,9 +762,11 @@
 
     updateWithApiData: function (json) {
       var data = Ember.get(this, 'data');
-      Ember.beginPropertyChanges(data);
-      Ember.Resource.deepMerge(data, this.constructor.parse(json));
-      Ember.endPropertyChanges(data);
+      if (data) {
+        Ember.beginPropertyChanges(data);
+        Ember.Resource.deepMerge(data, this.constructor.parse(json));
+        Ember.endPropertyChanges(data);
+      }
     },
 
     willFetch: function () {},

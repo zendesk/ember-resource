@@ -1,4 +1,6 @@
-describe('A Resource instance', function() {
+/*globals Ember*/
+
+describe('A Resource instance', function () {
   var Model, model, server;
 
   beforeEach(function() {
@@ -10,16 +12,13 @@ describe('A Resource instance', function() {
       },
       url: '/people'
     });
-
   });
 
-
   describe("defining a resource", function() {
-
     describe("with a sideloads attribute", function() {
       var subject;
       beforeEach(function() {
-        subject = Em.Resource.define({
+        subject = Ember.Resource.define({
           url: "/users",
           sideloads: ["abilities", "weapons"]
         });
@@ -32,9 +31,9 @@ describe('A Resource instance', function() {
 
       it("should send the sideloads in AJAX fetches", function() {
         var user = subject.create({id: 1});
-        spyOn(Em.Resource, 'ajax').andReturn($.when());
+        spyOn(Ember.Resource, 'ajax').andReturn($.when());
         user.fetch();
-        expect(Em.Resource.ajax).toHaveBeenCalledWith({
+        expect(Ember.Resource.ajax).toHaveBeenCalledWith({
           url: "/users/1",
           resource: user,
           operation: 'read',
@@ -45,7 +44,6 @@ describe('A Resource instance', function() {
   });
 
   describe('with no ID', function() {
-
     beforeEach(function() {
       model = Model.create({});
     });
@@ -62,7 +60,6 @@ describe('A Resource instance', function() {
       model.set('name', undefined);
       expect(model.get('name')).toBeUndefined();
     });
-
   });
 
   describe('with a negative ID', function() {
@@ -72,7 +69,7 @@ describe('A Resource instance', function() {
 
     it('should not have a URL', function() {
       expect(model.resourceURL()).toBeUndefined();
-    })
+    });
   });
 
   it('allows setting of properties not in the schema during creation', function() {
@@ -112,9 +109,7 @@ describe('A Resource instance', function() {
     expect(model.get('undefinedProperty')).toEqual('foo!');
   });
 
-
   it('allows setting of properties not in the schema during creation, considering paths', function() {
-
     Model = Ember.Resource.define({
       schema: {
         id:       Number,
@@ -125,11 +120,7 @@ describe('A Resource instance', function() {
     });
 
     model = Model.create({ id: 1, undefinedProperty: 'foo', entry_id: 1, foo: 'bar' });
-    // expect(model.get('undefinedProperty')).toEqual('foo');
-    // expect(model.get('id')).toEqual(1);
-
   });
-
 
   describe('updating objects already in identity map', function() {
     beforeEach(function() {
@@ -155,6 +146,20 @@ describe('A Resource instance', function() {
       model.set('name', 'Zebra');
       expect(model.resourcePropertyWillChange).toHaveBeenCalledWith('name', 'Zebra');
       expect(model.resourcePropertyDidChange).toHaveBeenCalledWith('name', 'Zebra');
+    });
+  });
+
+  describe('Given a model with no data', function() {
+    beforeEach(function() {
+      model = Model.create();
+      model.set('data', undefined);
+      expect(Ember.get(model, 'data')).toBe(undefined);
+    });
+
+    describe('updating that model with api data', function() {
+      it('should not blow up', function() {
+        model.updateWithApiData({ foo: 'bar' });
+      });
     });
   });
 });
