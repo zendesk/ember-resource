@@ -681,8 +681,8 @@
 
       isFetchable: Ember.computed('resourceState', function () {
         var state = Ember.get(this, 'resourceState');
-        return state == Ember.Resource.Lifecycle.UNFETCHED || state === Ember.Resource.Lifecycle.EXPIRED;
-      }).cacheable(),
+        return state == Ember.Resource.Lifecycle.UNFETCHED || this.get('isExpired');
+      }),
 
       isAutoFetchable: Ember.computed('isFetchable', 'autoFetch', function () {
         return this.get('isFetchable') && this.get('autoFetch');
@@ -729,30 +729,21 @@
         });
       },
 
-      updateIsExpired: Ember.observer(function () {
-        var isExpired = Ember.get(this, 'resourceState') === Ember.Resource.Lifecycle.EXPIRED;
-        if (isExpired) return true;
+      expireNow: function() {
+        Ember.set(this, 'expireAt', new Date());
+      },
 
-        var expireAt = Ember.get(this, 'expireAt');
-        if (expireAt) {
-          var now = Ember.Resource.Lifecycle.clock.get('now');
-          isExpired = expireAt.getTime() <= now.getTime();
-        }
-
-        var oldIsExpired = Ember.get(this, 'isExpired');
-
-        if ((isExpired && !oldIsExpired) ||
-            ((isExpired === false) && oldIsExpired)) {
-          Ember.set(this, 'isExpired', isExpired);
-        }
-      }, 'Ember.Resource.Lifecycle.clock.now', 'expireAt', 'resourceState'),
+      refresh: function() {
+        this.expireNow();
+        return this.fetch();
+      },
 
       isExpired: Ember.computed(function (name, value) {
-        if (value) {
-          Ember.set(this, 'resourceState', Ember.Resource.Lifecycle.EXPIRED);
-        }
-        return value;
-      }).cacheable()
+        var expireAt = this.get('expireAt');
+        var now = new Date();
+
+        return !!(expireAt && expireAt.getTime() <= now.getTime());
+      })
     })
   };
   Ember.Resource.Lifecycle.clock.start();

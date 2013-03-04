@@ -51,7 +51,7 @@
       if (this.stale(updatedAt)) {
         this.set('expiryUpdatedAt', updatedAt);
         if (this.get('remoteExpiryAutoFetch')) {
-          this.set('isExpired', true);
+          this.expireNow();
           this.fetch();
         } else {
           this.expire();

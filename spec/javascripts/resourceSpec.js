@@ -162,4 +162,42 @@ describe('A Resource instance', function () {
       });
     });
   });
+
+  describe('Given a model that expires five minutes from now', function() {
+    var time;
+    beforeEach(function() {
+      time = new Date();
+      time.setSeconds(time.getSeconds() + (60*5));
+      model = Model.create();
+      model.set('expireAt', time);
+      expect(model.get('isExpired')).toBeFalsy();
+    });
+
+    describe('Calling expire now', function() {
+      beforeEach(function() {
+        model.expireNow();
+      });
+
+      it('expires the model', function() {
+        expect(model.get('isExpired')).toBeTruthy();
+      });
+    });
+
+    describe('Calling refresh', function() {
+      beforeEach(function() {
+        model = Model.create();
+        spyOn(model, 'fetch');
+        model.refresh();
+      });
+
+      it('expires the model', function() {
+        expect(model.get('isExpired')).toBeTruthy();
+      });
+
+      it('fetches the model', function() {
+        expect(model.fetch).toHaveBeenCalled();
+      });
+    });
+  });
+
 });

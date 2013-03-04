@@ -80,7 +80,6 @@ describe('Lifecycle', function() {
 
     beforeEach(function() {
       person = Person.create({id: 1});
-      Ember.Resource.Lifecycle.clock.tick();
     });
 
     it('should be expired with an expireAt in the past', function() {
@@ -88,7 +87,6 @@ describe('Lifecycle', function() {
       expiry.setFullYear(expiry.getFullYear() - 1);
       person.set('expireAt', expiry);
       expect(person.get('isExpired')).toBe(true);
-      expect(person.get('resourceState')).toBe(Ember.Resource.Lifecycle.EXPIRED);
     });
 
     it('should be expired with an expireAt in the future', function() {
@@ -99,13 +97,27 @@ describe('Lifecycle', function() {
       expect(person.get('resourceState')).toBe(Ember.Resource.Lifecycle.UNFETCHED);
     });
 
-    it('should expire when "expire" is called', function() {
-      expect(person.get('isExpired')).toBeFalsy();
-      person.expire();
-      waitsFor(function() {
-        return person.get('isExpired');
-      }, 'person never expired', 1000);
+    describe('when "expire" is called', function() {
+      beforeEach(function() {
+        expect(person.get('isExpired')).toBeFalsy();
+        person.set('resourceState', Ember.Resource.Lifecycle.FETCHED);
+        expect(person.get('isFetchable')).toBeFalsy();
+        person.expire();
+      });
+
+      it('should expire the object', function() {
+        waitsFor(function() {
+          return person.get('isExpired');
+        }, 'person never expired', 1000);
+      });
+
+      it('should result in the object becoming fetchable', function() {
+        waitsFor(function() {
+          return person.get('isFetchable');
+        }, 'person to become fetchable', 1000);
+      });
     });
+
   });
 
 });
