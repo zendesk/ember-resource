@@ -98,10 +98,13 @@ describe('Lifecycle', function() {
     });
 
     describe('when "expire" is called', function() {
+      var tickSpy;
+
       beforeEach(function() {
         expect(person.get('isExpired')).toBeFalsy();
         person.set('resourceState', Ember.Resource.Lifecycle.FETCHED);
         expect(person.get('isFetchable')).toBeFalsy();
+        tickSpy = spyOn(Ember.Resource.Lifecycle.clock, 'tick');
         person.expire();
       });
 
@@ -115,6 +118,16 @@ describe('Lifecycle', function() {
         waitsFor(function() {
           return person.get('isFetchable');
         }, 'person to become fetchable', 1000);
+      });
+
+      it('should not tick the ember resource clock', function() {
+        waitsFor(function() {
+          return person.get('isExpired') && person.get('isFetchable');
+        }, 'person never expired', 1000);
+
+        runs(function() {
+          expect(tickSpy).not.toHaveBeenCalled();
+        });
       });
     });
 

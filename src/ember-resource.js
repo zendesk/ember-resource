@@ -725,7 +725,6 @@
       expire: function () {
         Ember.run.next(this, function () {
           Ember.set(this, 'expireAt', new Date());
-          Ember.Resource.Lifecycle.clock.tick();
         });
       },
 
