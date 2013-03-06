@@ -1220,8 +1220,19 @@
       return this.map(function(item) {
         return item.toJSON();
       });
+    },
+
+    destroy: function() {
+      if(this.get('id')) {
+        this.constructor.identityMap.remove(this.get('id'));
+      }
+      return this._super();
     }
   }, Ember.Resource.Lifecycle.prototypeMixin);
+
+  var makeId = function(type, url) {
+    return [Ember.guidFor(type), url].join();
+  };
 
   Ember.ResourceCollection.reopenClass({
     isEmberResourceCollection: true,
@@ -1237,9 +1248,9 @@
 
       if (!options.prePopulated && options.url) {
         this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit);
-        var identity = [options.type, options.url];
-        instance = this.identityMap.get(identity) || this._super.call(this, options);
-        this.identityMap.put(identity, instance);
+        options.id = options.id || makeId(options.type, options.url);
+        instance = this.identityMap.get(options.id) || this._super.call(this, options);
+        this.identityMap.put(options.id, instance);
       }
 
       if (!instance) {
