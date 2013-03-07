@@ -742,7 +742,15 @@
         var now = new Date();
 
         return !!(expireAt && expireAt.getTime() <= now.getTime());
-      }).volatile()
+      }).volatile(),
+
+      destroy: function() {
+        if (this.get('id')) {
+          this.constructor.identityMap.remove(this.get('id'));
+        }
+        this._super();
+      }
+
     })
   };
   Ember.Resource.Lifecycle.clock.start();
@@ -898,13 +906,6 @@
       });
 
       return deferedSave;
-    },
-
-    destroy: function() {
-      if (this.get('id')) {
-        this.constructor.identityMap.remove(this.get('id'));
-      }
-      this._super();
     },
 
     destroyResource: function() {
@@ -1220,14 +1221,8 @@
       return this.map(function(item) {
         return item.toJSON();
       });
-    },
-
-    destroy: function() {
-      if(this.get('id')) {
-        this.constructor.identityMap.remove(this.get('id'));
-      }
-      return this._super();
     }
+
   }, Ember.Resource.Lifecycle.prototypeMixin);
 
   var makeId = function(type, url) {
