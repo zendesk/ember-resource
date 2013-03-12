@@ -7,5 +7,4 @@
     resourcePropertyDidChange: window.Ember.K
   });
 
-  window.Ember.Resource.SUPPORT_AUTOFETCH = true;
 }());

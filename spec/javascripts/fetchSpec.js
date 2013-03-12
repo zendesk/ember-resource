@@ -8,8 +8,6 @@ describe('deferred fetch', function() {
         id:       Number,
         name:     String
       }
-    }).extend({
-      autoFetch: false
     });
 
     server = sinon.fakeServer.create();

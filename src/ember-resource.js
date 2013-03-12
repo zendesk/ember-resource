@@ -58,16 +58,11 @@
 
   Ember.Resource.AbstractSchemaItem = Ember.Object.extend({
     name: Ember.required(String),
-    fetchable: Ember.required(Boolean),
     getValue: Ember.required(Function),
     setValue: Ember.required(Function),
 
     dependencies: Ember.computed('path', function() {
       var deps = ['data.' + this.get('path')];
-
-      if (Ember.Resource.SUPPORT_AUTOFETCH) {
-        deps.push('isExpired');
-      }
 
       return deps;
     }).cacheable(),
@@ -98,9 +93,6 @@
         this.resourcePropertyDidChange(name, value);
       } else {
         value = schemaItem.getValue.call(schemaItem, this);
-        if ((value === undefined || Ember.get(this, 'isExpired')) && schemaItem.get('fetchable')) {
-          this.scheduleFetch();
-        }
       }
       return value;
     },
@@ -154,7 +146,6 @@
   });
 
   Ember.Resource.AttributeSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
-    fetchable: true,
     theType: Object,
     path: Ember.required(String),
 
@@ -207,14 +198,12 @@
           return Ember.Resource.DateAttributeSchemaItem.create(name, schema);
         default:
           instance = this._super.apply(this, arguments);
-          instance.set('fetchable', name !== 'id');
           instance.set('path', definition.path || name);
           return instance;
         }
       }
       else {
         instance = this._super.apply(this, arguments);
-        instance.set('fetchable', name !== 'id');
         instance.set('path', definition.path || name);
         return instance;
       }
@@ -273,9 +262,7 @@
     }
   });
 
-  Ember.Resource.HasOneSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
-    fetchable: true
-  });
+  Ember.Resource.HasOneSchemaItem = Ember.Resource.AbstractSchemaItem.extend({ });
   Ember.Resource.HasOneSchemaItem.reopenClass({
     create: function(name, schema) {
       var definition = schema[name];
@@ -342,7 +329,6 @@
     }
   });
   Ember.Resource.HasOneNestedIdSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
-    fetchable: true,
     theType: Number,
     getValue: function(instance) {
       return instance.getPath(this.get('path'));
@@ -435,7 +421,6 @@
   });
 
   Ember.Resource.HasManyRemoteSchemaItem = Ember.Resource.HasManySchemaItem.extend({
-    fetchable: false,
     dependencies: ['id', 'isInitializing'],
     getValue: function(instance) {
       if (Ember.get(instance, 'isInitializing')) return;
@@ -482,7 +467,6 @@
   });
 
   Ember.Resource.HasManyNestedSchemaItem = Ember.Resource.HasManySchemaItem.extend({
-    fetchable: true,
     getValue: function(instance) {
       var data = this.data(instance);
       if (!data) return;
@@ -520,8 +504,7 @@
   });
 
   Ember.Resource.HasManyInArraySchemaItem = Ember.Resource.HasManySchemaItem.extend({
-    fetchable: true,
-    getValue: function(instance) {
+    getValue: function (instance) {
       var data = this.data(instance);
       if (!data) return;
       data = Ember.getPath(data, this.get('path'));
@@ -636,18 +619,13 @@
     prototypeMixin: Ember.Mixin.create({
       expireIn: 60 * 5,
       resourceState: 0,
-      autoFetch: true,
 
       init: function() {
         this._super.apply(this, arguments);
 
         var self = this;
 
-        if (!Ember.Resource.SUPPORT_AUTOFETCH) {
-          this.set('autoFetch', false);
-        }
-
-        var updateExpiry = function() {
+        var updateExpiry = function () {
           var expireAt = new Date();
           expireAt.setSeconds(expireAt.getSeconds() + Ember.get(self, 'expireIn'));
           Ember.set(self, 'expireAt', expireAt);
@@ -684,11 +662,7 @@
         return state == Ember.Resource.Lifecycle.UNFETCHED || this.get('isExpired');
       }).volatile(),
 
-      isAutoFetchable: Ember.computed('isFetchable', 'autoFetch', function() {
-        return this.get('isFetchable') && this.get('autoFetch');
-      }).cacheable(),
-
-      isInitializing: Ember.computed('resourceState', function() {
+      isInitializing: Ember.computed('resourceState', function () {
         return (Ember.get(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
       }).cacheable(),
 
@@ -716,14 +690,8 @@
         return (Ember.get(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
       }).cacheable(),
 
-      scheduleFetch: function() {
-        if (Ember.get(this, 'isAutoFetchable')) {
-          Ember.run.next(this, this.fetch);
-        }
-      },
-
-      expire: function() {
-        Ember.run.next(this, function() {
+      expire: function () {
+        Ember.run.next(this, function () {
           Ember.set(this, 'expireAt', new Date());
         });
       },
@@ -1198,10 +1166,9 @@
       }
     },
 
-    length: Ember.computed('content.length', 'resourceState', 'isExpired', function() {
+    length: Ember.computed('content.length', 'resourceState', function() {
       var content = Ember.get(this, 'content');
       var length = content ? Ember.get(content, 'length') : 0;
-      if (length === 0 ||  Ember.get(this, 'isExpired'))  this.scheduleFetch();
       return length;
     }).cacheable(),
 
@@ -1211,14 +1178,8 @@
       }
     }).cacheable(),
 
-    autoFetchOnExpiry: Ember.observer(function() {
-      if (Ember.get(this, 'isAutoFetchable') && Ember.get(this, 'isExpired') && Ember.get(this, 'hasArrayObservers')) {
-        this.fetch();
-      }
-    }, 'isExpired', 'hasArrayObservers'),
-
-    toJSON: function() {
-      return this.map(function(item) {
+    toJSON: function () {
+      return this.map(function (item) {
         return item.toJSON();
       });
     }
