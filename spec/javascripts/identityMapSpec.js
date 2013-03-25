@@ -3,6 +3,25 @@ describe('identity map', function() {
     identityMapLimit: 10
   });
 
+  describe('that wants to skip the identity map', function() {
+    var Model;
+    beforeEach(function() {
+      Model = Em.Resource.define({
+        useIdentityMap: false
+      });
+    });
+
+    it('should not have an identity map', function() {
+      expect(Model.identityMap).toBeUndefined();
+    });
+
+    it('should not get an identity map when you create an instance', function() {
+      Model.create({id: 1});
+      expect(Model.identityMap).toBeUndefined();
+    });
+
+  });
+
   it('should default to a limit of DEFAULT_IDENTITY_MAP_LIMIT', function() {
     var Foo = Em.Resource.define();
     Foo.create({id: 1});
