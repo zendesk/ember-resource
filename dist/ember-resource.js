@@ -367,7 +367,8 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   var expandSchema, expandSchemaItem, createSchemaProperties,
       mergeSchemas;
 
-  var Ember = exports.Ember;
+  var Ember = exports.Ember,
+      getPath = Ember.getPath || Ember.get;
 
   function isString(obj) {
     return !!(obj === '' || (obj && obj !== String && obj.charCodeAt && obj.substr));
@@ -376,6 +377,11 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   function isObject(obj) {
     return obj === Object(obj);
   }
+
+  // Used when evaluating schemas to turn a type String into a class.
+  Ember.Resource.lookUpType = function(string) {
+    return getPath(string);
+  };
 
   Ember.Resource.deepSet = function(obj, path, value) {
     if (Ember.typeOf(path) === 'string') {
@@ -443,7 +449,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     type: Ember.computed('theType', function() {
       var type = this.get('theType');
       if (isString(type)) {
-        type = Ember.getPath(type);
+        type = Ember.Resource.lookUpType(type);
         if (type) {
           this.set('theType', type);
         } else {
@@ -526,7 +532,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       var value;
       var data = this.data(instance);
       if (data) {
-        value = Ember.getPath(data, this.get('path'));
+        value = getPath(data, this.get('path'));
       }
 
       if (this.typeCast) {
@@ -666,7 +672,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       var data = this.data(instance);
       if (!data) return;
       var type = this.get('type');
-      var value = Ember.getPath(data, this.get('path'));
+      var value = getPath(data, this.get('path'));
       if (value) {
         value = (this.get('parse') || type.parse).call(type, Ember.copy(value));
         return type.create({}, value);
@@ -730,7 +736,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     getValue: function(instance) {
       var data = this.data(instance);
       if (!data) return;
-      var id = Ember.getPath(data, this.get('path'));
+      var id = getPath(data, this.get('path'));
       if (id) {
         return this.get('type').create({}, {id: id});
       }
@@ -764,7 +770,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     itemType: Ember.computed('theItemType', function() {
       var type = this.get('theItemType');
       if (isString(type)) {
-        type = Ember.getPath(type);
+        type = Ember.Resource.lookUpType(type);
         if (type) {
           this.set('theItemType', type);
         } else {
@@ -850,7 +856,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     getValue: function(instance) {
       var data = this.data(instance);
       if (!data) return;
-      data = Ember.getPath(data, this.get('path'));
+      data = getPath(data, this.get('path'));
       if (data === undefined || data === null) return data;
       data = Ember.copy(data);
 
@@ -888,7 +894,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     getValue: function(instance) {
       var data = this.data(instance);
       if (!data) return;
-      data = Ember.getPath(data, this.get('path'));
+      data = getPath(data, this.get('path'));
       if (data === undefined || data === null) return data;
 
 
@@ -1532,7 +1538,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     },
     _resolveType: function() {
       if (isString(this.type)) {
-        var type = Ember.getPath(this.type);
+        var type = Ember.Resource.lookUpType(this.type);
         if (type) this.type = type;
       }
     },
