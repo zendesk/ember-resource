@@ -1073,6 +1073,13 @@
       return klass;
     },
 
+    extendSchema: function(schema) {
+      schema = expandSchema(schema);
+      this.schema = mergeSchemas(schema, this.schema);
+      this.reopen(createSchemaProperties(schema));
+      return this;
+    },
+
     resourceURL: function(instance) {
       if (Ember.typeOf(this.url) == 'function') {
         return this.url(instance);

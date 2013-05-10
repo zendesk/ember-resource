@@ -200,4 +200,16 @@ describe('A Resource instance', function () {
     });
   });
 
+  describe("extending schema", function() {
+    beforeEach(function() {
+      Model.extendSchema({
+        description: String
+      });
+    });
+
+    it("should change the schema", function() {
+      model = Model.create({description: "Boo"});
+      expect(model.toJSON().description).toEqual("Boo");
+    });
+  });
 });
