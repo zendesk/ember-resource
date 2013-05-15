@@ -62,16 +62,6 @@ describe('A Resource instance', function () {
     });
   });
 
-  describe('with a negative ID', function() {
-    beforeEach(function() {
-      model = Model.create({id: -1});
-    });
-
-    it('should not have a URL', function() {
-      expect(model.resourceURL()).toBeUndefined();
-    });
-  });
-
   it('allows setting of properties not in the schema during creation', function() {
     model = Model.create({
       undefinedProperty: 'foo'

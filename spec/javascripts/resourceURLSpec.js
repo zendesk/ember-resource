@@ -27,6 +27,26 @@ describe('resourceURL', function() {
         expect(instance.resourceURL()).toEqual("/users/me");
       });
     });
+
+    describe('for an instance with ID 0', function() {
+      beforeEach(function() {
+        instance = subject.create({ id: 0 });
+      });
+
+      it("should not have a URL", function() {
+        expect(instance.resourceURL()).toBeUndefined();
+      });
+    });
+
+    describe('for an instance with a negative ID', function() {
+      beforeEach(function() {
+        model = subject.create({ id: -1 });
+      });
+
+      it('should not have a URL', function() {
+        expect(instance.resourceURL()).toBeUndefined();
+      });
+    });
   });
 
   describe("for a resource with a function #url", function() {
