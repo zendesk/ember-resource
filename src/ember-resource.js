@@ -719,7 +719,7 @@
       }).volatile(),
 
       destroy: function() {
-        if (this.get('id')) {
+        if (this.get('id') && this.constructor.identityMap) {
           this.constructor.identityMap.remove(this.get('id'));
         }
         this._super();
