@@ -1,5 +1,6 @@
 describe('deferred fetch', function() {
-  var Person, people, server;
+  var Person, people, server,
+      PERSON_DATA = { "id": 1, "name": "Mick Staugaard" };
 
   beforeEach(function() {
     Person = Ember.Resource.define({
@@ -13,7 +14,7 @@ describe('deferred fetch', function() {
     server = sinon.fakeServer.create();
     server.respondWith("GET", "/people/1",
                        [200, { "Content-Type": "application/json" },
-                       '{ "id": 1, "name": "Mick Staugaard" }']);
+                       JSON.stringify(PERSON_DATA) ]);
 
 
   });
@@ -32,7 +33,7 @@ describe('deferred fetch', function() {
       person.fetch();
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
+      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
     });
   });
 
@@ -44,7 +45,7 @@ describe('deferred fetch', function() {
       person.fetch().done(handler);
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
+      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
     });
   });
 
@@ -57,7 +58,7 @@ describe('deferred fetch', function() {
       server.respond();
 
       person.fetch().done(handler);
-      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
+      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
     });
   });
 
@@ -116,7 +117,7 @@ describe('deferred fetch', function() {
     beforeEach(function() {
       server.respondWith("GET", "/people",
                          [200, { "Content-Type": "application/json" },
-                         '[{ "id": 1, "name": "Mick Staugaard" }]']);
+                         JSON.stringify([ PERSON_DATA ]) ]);
       people = Ember.ResourceCollection.create({type: Person});
 
     });
@@ -141,7 +142,7 @@ describe('deferred fetch', function() {
       waits(1000);
 
       runs(function() {
-        expect(handler).toHaveBeenCalledWith([{ "id": 1, "name": "Mick Staugaard" }], people);
+        expect(handler).toHaveBeenCalledWith([PERSON_DATA], people);
       });
     });
   });
