@@ -756,7 +756,7 @@
 
     fetch: function(ajaxOptions) {
       var sideloads;
-      if (!Ember.get(this, 'isFetchable')) return $.when(this);
+      if (!Ember.get(this, 'isFetchable')) return $.when(this.get('data'), this);
 
       var url = this.resourceURL();
 
@@ -788,13 +788,14 @@
           self.updateWithApiData(json);
           self.didFetch.call(self);
           Ember.sendEvent(self, 'didFetch');
-          self.fetched().resolve(self);
-          result.resolve(self);
+          self.fetched().resolve(json, self);
+          result.resolve(json, self);
         })
         .fail(function() {
           self.didFail.call(self);
           Ember.sendEvent(self, 'didFail');
-          self.fetched().reject();
+          var fetched = self.fetched();
+          fetched.reject.apply(fetched, arguments);
           result.reject.apply(result, arguments);
         }).
         always(function() {
@@ -1141,14 +1142,16 @@
       this._fetch(ajaxOptions)
         .done(function(json) {
           Ember.set(self, 'content', self.parse(json));
-          result.resolve(self);
+          self.fetched().resolve(json, self);
+          result.resolve(json, self);
         })
         .fail(function() {
+          var fetched = self.fetched();
           result.reject.apply(result, arguments);
+          fetched.reject.apply(fetched, arguments);
         })
         .always(function() {
           Ember.sendEvent(self, 'didFetch');
-          self.fetched().resolve(self);
           self.deferredFetch = null;
         });
 

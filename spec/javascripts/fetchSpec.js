@@ -32,7 +32,7 @@ describe('deferred fetch', function() {
       person.fetch();
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith(person);
+      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
     });
   });
 
@@ -44,7 +44,7 @@ describe('deferred fetch', function() {
       person.fetch().done(handler);
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith(person);
+      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
     });
   });
 
@@ -57,7 +57,7 @@ describe('deferred fetch', function() {
       server.respond();
 
       person.fetch().done(handler);
-      expect(handler).toHaveBeenCalledWith(person);
+      expect(handler).toHaveBeenCalledWith({ "id": 1, "name": "Mick Staugaard" }, person);
     });
   });
 
@@ -114,7 +114,6 @@ describe('deferred fetch', function() {
 
   describe("fetched() for resource collections", function() {
     beforeEach(function() {
-      server.restore();
       server.respondWith("GET", "/people",
                          [200, { "Content-Type": "application/json" },
                          '[{ "id": 1, "name": "Mick Staugaard" }]']);
@@ -142,7 +141,7 @@ describe('deferred fetch', function() {
       waits(1000);
 
       runs(function() {
-        expect(handler).toHaveBeenCalledWith(people);
+        expect(handler).toHaveBeenCalledWith([{ "id": 1, "name": "Mick Staugaard" }], people);
       });
     });
   });

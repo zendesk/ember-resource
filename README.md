@@ -157,7 +157,7 @@ MyApp.Comment = Ember.Resource.define({
 });
 ```
 
-### Fetching
+### Fetching, Saving, and Destroying
 
 Fetch a resource with `fetch`:
 
@@ -168,8 +168,13 @@ MyApp.Comment.create({ id: 13 }).fetch();
 
 Calling `fetch` will issue an AJAX request to the resource's URL. It will
 return a [promise](http://api.jquery.com/category/deferred-object/). If the
-AJAX request responds normally, the promise will resolve with the resource.
-If it fails, the promised will fail with the AJAX error.
+AJAX request responds normally, the promise will resolve with the API response
+and the resource. If it fails, the promised will fail with the AJAX error.
+
+The success callbacks for `save` and `destroyResource` have a slightly
+different signature. Those deferreds resolve with the resource and a String
+describing the action that occurred (one of
+`[ "create", "update", "destroy" ]`).
 
 ## Testing
 
