@@ -756,7 +756,7 @@
 
     fetch: function(ajaxOptions) {
       var sideloads;
-      if (!Ember.get(this, 'isFetchable')) return $.when();
+      if (!Ember.get(this, 'isFetchable')) return $.when(this);
 
       var url = this.resourceURL();
 
@@ -781,27 +781,27 @@
         ajaxOptions.data = {include: sideloads.join(",")};
       }
 
-      this.deferedFetch = Ember.Resource.ajax(ajaxOptions).done(function(json) {
-        self.updateWithApiData(json);
-      });
+      var result = this.deferedFetch = $.Deferred();
 
-      this.deferedFetch.fail(function() {
-        self.didFail.call(self);
-        Ember.sendEvent(self, 'didFail');
-        self.fetched().reject();
-      });
+      Ember.Resource.ajax(ajaxOptions)
+        .done(function(json) {
+          self.updateWithApiData(json);
+          self.didFetch.call(self);
+          Ember.sendEvent(self, 'didFetch');
+          self.fetched().resolve(self);
+          result.resolve(self);
+        })
+        .fail(function() {
+          self.didFail.call(self);
+          Ember.sendEvent(self, 'didFail');
+          self.fetched().reject();
+          result.reject.apply(result, arguments);
+        }).
+        always(function() {
+          self.deferedFetch = null;
+        });
 
-      this.deferedFetch.done(function() {
-        self.didFetch.call(self);
-        Ember.sendEvent(self, 'didFetch');
-        self.fetched().resolve();
-      });
-
-      this.deferedFetch.always(function() {
-        self.deferedFetch = null;
-      });
-
-      return this.deferedFetch;
+      return result.promise();
     },
 
     resourceURL: function() {
@@ -1128,7 +1128,7 @@
     },
 
     fetch: function(ajaxOptions) {
-      if (!Ember.get(this, 'isFetchable') || Ember.get(this, 'prePopulated')) return $.when();
+      if (!Ember.get(this, 'isFetchable') || Ember.get(this, 'prePopulated')) return $.when(this);
 
       var self = this;
 
@@ -1136,33 +1136,42 @@
 
       Ember.sendEvent(self, 'willFetch');
 
-      this.deferedFetch = this._fetch(function(json) {
-        Ember.set(self, 'content', self.parse(json));
-      }, ajaxOptions);
+      var result = this.deferedFetch = $.Deferred();
 
-      this.deferedFetch.always(function() {
-        Ember.sendEvent(self, 'didFetch');
-        self.fetched().resolve();
-        self.deferredFetch = null;
-      });
-      return this.deferedFetch;
+      this._fetch(ajaxOptions)
+        .done(function(json) {
+          Ember.set(self, 'content', self.parse(json));
+          result.resolve(self);
+        })
+        .fail(function() {
+          result.reject.apply(result, arguments);
+        })
+        .always(function() {
+          Ember.sendEvent(self, 'didFetch');
+          self.fetched().resolve(self);
+          self.deferredFetch = null;
+        });
+
+      return result.promise();
     },
+
     _resolveType: function() {
       if (isString(this.type)) {
         var type = Ember.Resource.lookUpType(this.type);
         if (type) this.type = type;
       }
     },
-    _fetch: function(callback, ajaxOptions) {
+
+    _fetch: function(ajaxOptions) {
       this._resolveType();
       ajaxOptions = $.extend({}, ajaxOptions, {
         url: this.resolveUrl(),
         resource: this,
-        operation: 'read',
-        success: callback
+        operation: 'read'
       });
       return Ember.Resource.ajax(ajaxOptions);
     },
+
     resolveUrl: function() {
       return this.get('url') || this.type.resourceURL();
     },

@@ -23,7 +23,7 @@ describe('deferred fetch', function() {
   });
 
   describe("fetched() for resources", function() {
-    it("should resolve when the fetch completes", function() {
+    it("should resolve with the resource when the fetch completes", function() {
       var handler = jasmine.createSpy('onFetch');
 
       var person = Person.create({id: 1});
@@ -32,7 +32,32 @@ describe('deferred fetch', function() {
       person.fetch();
       server.respond();
 
-      expect(handler).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalledWith(person);
+    });
+  });
+
+  describe('fetch() for unfetched resources', function() {
+    it('resolves with the resource when the server responds', function() {
+      var handler = jasmine.createSpy('onFetch'),
+          person = Person.create({id: 1});
+
+      person.fetch().done(handler);
+      server.respond();
+
+      expect(handler).toHaveBeenCalledWith(person);
+    });
+  });
+
+  describe('fetch() for fetched, non-expired resources', function() {
+    it('should resolve with the resource immediately', function() {
+      var handler = jasmine.createSpy('onFetch'),
+          person = Person.create({id: 1});
+
+      person.fetch();
+      server.respond();
+
+      person.fetch().done(handler);
+      expect(handler).toHaveBeenCalledWith(person);
     });
   });
 
@@ -101,7 +126,7 @@ describe('deferred fetch', function() {
       window.stopHere = false;
     });
 
-    it("should resolve when the fetch completes", function() {
+    it("should resolve with the collection when the fetch completes", function() {
 
       var handler = jasmine.createSpy('onFetch');
 
@@ -117,7 +142,7 @@ describe('deferred fetch', function() {
       waits(1000);
 
       runs(function() {
-        expect(handler).toHaveBeenCalled();
+        expect(handler).toHaveBeenCalledWith(people);
       });
     });
   });
