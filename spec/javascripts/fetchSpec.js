@@ -24,12 +24,10 @@ describe('deferred fetch', function() {
 
   describe("fetched() for resources", function() {
     it("should resolve when the fetch completes", function() {
-      var handler = jasmine.createSpy();
+      var handler = jasmine.createSpy('onFetch');
 
       var person = Person.create({id: 1});
-      person.fetched().done(function() {
-        handler();
-      });
+      person.fetched().done(handler);
 
       person.fetch();
       server.respond();
@@ -105,14 +103,12 @@ describe('deferred fetch', function() {
 
     it("should resolve when the fetch completes", function() {
 
-      var handler = jasmine.createSpy();
+      var handler = jasmine.createSpy('onFetch');
 
       runs(function() {
         people.expire();
 
-        people.fetched().done(function() {
-          handler();
-        });
+        people.fetched().done(handler);
 
         people.fetch();
         server.respond();
