@@ -157,6 +157,20 @@ MyApp.Comment = Ember.Resource.define({
 });
 ```
 
+### Fetching
+
+Fetch a resource with `fetch`:
+
+```javascript
+MyApp.Comment = Ember.Resource.define({...});
+MyApp.Comment.create({ id: 13 }).fetch();
+```
+
+Calling `fetch` will issue an AJAX request to the resource's URL. It will
+return a [promise](http://api.jquery.com/category/deferred-object/). If the
+AJAX request responds normally, the promise will resolve with the resource.
+If it fails, the promised will fail with the AJAX error.
+
 ## Testing
 
 Currently the command line test runners are in a state of disrepair :( To run
