@@ -81,4 +81,22 @@ describe('identity map', function() {
 
 
   });
+
+  describe("Who wish to opt out of the identity map", function() {
+    var Collection;
+
+    beforeEach(function() {
+      Collection = Em.ResourceCollection.extend().reopenClass({
+        useIdentityMap: false
+      });
+    });
+
+    it("should return different collections when requested multiple times", function() {
+      var addresses1 = Collection.create({ type: Address, url: '/addresses' });
+      var addresses2 = Collection.create({ type: Address, url: '/addresses' });
+
+      expect(addresses1).not.toBe(addresses2);
+    });
+  });
+
 });

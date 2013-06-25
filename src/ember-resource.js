@@ -1225,6 +1225,8 @@
   Ember.ResourceCollection.reopenClass({
     isEmberResourceCollection: true,
     identityMapLimit: Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT * 5,
+    useIdentityMap: true,
+
     create: function(options) {
       options = options || {};
       var content = options.content;
@@ -1234,7 +1236,7 @@
 
       var instance;
 
-      if (!options.prePopulated && options.url) {
+      if (!options.prePopulated && options.url && this.useIdentityMap) {
         this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit);
         options.id = options.id || makeId(options.type, options.url);
         instance = this.identityMap.get(options.id) || this._super.call(this, options);
