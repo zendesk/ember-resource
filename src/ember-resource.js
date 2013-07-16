@@ -67,11 +67,7 @@
     getValue: Ember.required(Function),
     setValue: Ember.required(Function),
 
-    dependencies: Ember.computed('path', function() {
-      var deps = ['data.' + this.get('path')];
-
-      return deps;
-    }).cacheable(),
+    dependencies: ['_new_data'],
 
     data: function(instance) {
       return Ember.get(instance, 'data');
@@ -734,10 +730,13 @@
 
     updateWithApiData: function(json) {
       var data = Ember.get(this, 'data');
+
       if (data) {
         Ember.beginPropertyChanges(data);
         Ember.Resource.deepMerge(data, this.constructor.parse(json));
         Ember.endPropertyChanges(data);
+
+        Ember.propertyDidChange(this, '_new_data');
       }
     },
 

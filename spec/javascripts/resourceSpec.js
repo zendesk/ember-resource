@@ -139,6 +139,33 @@ describe('A Resource instance', function () {
     });
   });
 
+  describe("Given a model instance", function() {
+    beforeEach(function() {
+      model = Model.create({name: 'Aardvark'});
+    });
+
+    describe("with an observer", function() {
+      var count;
+
+      beforeEach(function() {
+        count = 0;
+        Em.addObserver(model, 'name', function() {
+          count++;
+        });
+      });
+
+      describe("setting a property value", function() {
+        beforeEach(function() {
+          model.set('name', 'Zebra');
+        });
+
+        it("fires an observer once and only once", function() {
+          expect(count).toEqual(1);
+        });
+      });
+    });
+  });
+
   describe('Given a model with no data', function() {
     beforeEach(function() {
       model = Model.create();
