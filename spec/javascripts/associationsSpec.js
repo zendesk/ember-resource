@@ -14,6 +14,26 @@ describe('associations', function() {
     }
   });
 
+  describe("has one remote", function() {
+    var subject;
+
+    beforeEach(function() {
+      var Person = Ember.Resource.define({
+        schema: {
+          name: String,
+          address: {type: Address}
+        }
+      });
+      subject = Person.create({}, { "address_id": 1 });
+      spyOn(subject, 'updateWithApiData');
+      subject.get('address');
+    });
+
+    it("shouldn't call updateWithApiData when getting resource", function() {
+      expect(subject.updateWithApiData).not.toHaveBeenCalled();
+    });
+  });
+
   describe('has one embedded', function() {
     var data;
 

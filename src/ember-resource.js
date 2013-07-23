@@ -976,7 +976,12 @@
             instance = this._super.call(this, { data: data });
             this.identityMap.put(id, instance);
           } else {
-            instance.updateWithApiData(data);
+            var keys = Em.keys(data);
+            // Data.id is used by HasOneRemoteSchemaItem to request resource from identity map (no data is present),
+            // in this case avoid calling updateWithApiData (which fires didChange for all the resource properties)
+            if (!Em.empty(data) && Em.compare(keys, ['id']) !== 0) {
+              instance.updateWithApiData(data);
+            }
             // ignore incoming resourceState and id arguments
             delete options.resourceState;
             delete options.id;
