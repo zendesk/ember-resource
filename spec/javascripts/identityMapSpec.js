@@ -78,8 +78,6 @@ describe('identity map', function() {
 
       expect(Address.identityMap.size()).toBe(10);
     });
-
-
   });
 
   describe("Who wish to opt out of the identity map", function() {
@@ -96,6 +94,40 @@ describe('identity map', function() {
       var addresses2 = Collection.create({ type: Address, url: '/addresses' });
 
       expect(addresses1).not.toBe(addresses2);
+    });
+  });
+
+  describe('Given an object in the identity map', function() {
+    var model, spy;
+
+    beforeEach(function() {
+      Address.identityMap.clear();
+      model = Address.create({ id: 1 });
+      spy = spyOn(model, 'updateWithApiData');
+    });
+
+    afterEach(function() {
+      Address.identityMap.clear();
+    });
+
+    describe('Updating that instance from API data', function() {
+      beforeEach(function() {
+        Address.create({ id: 1 }, { foo: 'bar' });
+      });
+
+      it('should call updateWithApiData', function() {
+        expect(spy).toHaveBeenCalled();
+      });
+    });
+
+    describe('Updating that instance with empty API data', function() {
+      beforeEach(function() {
+        Address.create({ id: 1 }, {});
+      });
+
+      it('should not call updateWithApiData', function() {
+        expect(spy).not.toHaveBeenCalled();
+      });
     });
   });
 

@@ -14,6 +14,10 @@
     return obj === Object(obj);
   }
 
+  function isEmpty(obj) {
+    return $.isEmptyObject(obj);
+  }
+
   // Used when evaluating schemas to turn a type String into a class.
   Ember.Resource.lookUpType = function(string) {
     return getPath(string);
@@ -979,7 +983,7 @@
             var keys = Em.keys(data);
             // Data.id is used by HasOneRemoteSchemaItem to request resource from identity map (no data is present),
             // in this case avoid calling updateWithApiData (which fires didChange for all the resource properties)
-            if (!$.isEmptyObject(data) && Em.compare(keys, ['id']) !== 0) {
+            if (!isEmpty(data) && Em.compare(keys, ['id']) !== 0) {
               instance.updateWithApiData(data);
             }
             // ignore incoming resourceState and id arguments
