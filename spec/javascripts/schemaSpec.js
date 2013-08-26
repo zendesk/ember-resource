@@ -1,4 +1,6 @@
 describe('schema definition', function() {
+  var getPath = Ember.Resource.getPath;
+
   describe('of attributes', function() {
     var Model;
 
@@ -107,18 +109,18 @@ describe('schema definition', function() {
     expect(instance.get('size')).toBe(5);
 
     instance.set('id', '2');
-    expect(instance.getPath('data.id')).toBe(2);
+    expect(getPath(instance, 'data.id')).toBe(2);
 
     instance.set('size', 3);
-    expect(instance.getPath('data.size')).toBe(3);
+    expect(getPath(instance, 'data.size')).toBe(3);
 
     instance.set('size', 'foo');
     expect(instance.get('size')).toBeUndefined();
-    expect(instance.getPath('data.size')).toBeUndefined();
+    expect(getPath(instance, 'data.size')).toBeUndefined();
 
     instance.set('size', NaN);
     expect(instance.get('size')).toBeUndefined();
-    expect(instance.getPath('data.size')).toBeUndefined();
+    expect(getPath(instance, 'data.size')).toBeUndefined();
   });
 
   it('should create String properties', function() {
@@ -136,16 +138,16 @@ describe('schema definition', function() {
     expect(instance.get('size')).toBe('large');
 
     instance.set('id', 2);
-    expect(instance.getPath('data.id')).toBe('2');
+    expect(getPath(instance, 'data.id')).toBe('2');
 
     instance.set('size', 'small');
-    expect(instance.getPath('data.size')).toBe('small');
+    expect(getPath(instance, 'data.size')).toBe('small');
   });
 
   it('should create Date properties', function() {
     var date = new Date();
     var dateString = date.toJSON();
-    
+
     var Model = Ember.Resource.define({
       schema: {
         createdAt: Date,
@@ -163,10 +165,10 @@ describe('schema definition', function() {
     dateString = date.toJSON();
 
     instance.set('createdAt', date);
-    expect(instance.getPath('data.createdAt')).toEqual(dateString, "convert a Date instance to a string");
-    
+    expect(getPath(instance, 'data.createdAt')).toEqual(dateString, "convert a Date instance to a string");
+
     instance.set('updatedAt', dateString);
-    expect(instance.getPath('data.updatedAt')).toEqual(dateString, 'convert a string ("' + dateString + '") to a string');
+    expect(getPath(instance, 'data.updatedAt')).toEqual(dateString, 'convert a string ("' + dateString + '") to a string');
   });
 
   it('should create Boolean properties', function() {
@@ -188,15 +190,15 @@ describe('schema definition', function() {
     expect(instance.get('bad')).toBe(false);
 
     instance.set('public', 'true');
-    expect(instance.getPath('data.public')).toBe(true, "convert 'true' to true");
+    expect(getPath(instance, 'data.public')).toBe(true, "convert 'true' to true");
 
     instance.set('public', 'false');
-    expect(instance.getPath('data.public')).toBe(false, "convert 'false' to false");
+    expect(getPath(instance, 'data.public')).toBe(false, "convert 'false' to false");
 
     instance.set('public', true);
-    expect(instance.getPath('data.public')).toBe(true, "convert true to true");
+    expect(getPath(instance, 'data.public')).toBe(true, "convert true to true");
 
     instance.set('public', false);
-    expect(instance.getPath('data.public')).toBe(false, "convert false to false");
+    expect(getPath(instance, 'data.public')).toBe(false, "convert false to false");
   });
 });

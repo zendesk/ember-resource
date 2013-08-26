@@ -1,4 +1,6 @@
 describe('associations', function() {
+  var getPath = Ember.Resource.getPath;
+
   var Address = Ember.Resource.define({
     schema: {
       id:     Number,
@@ -63,8 +65,8 @@ describe('associations', function() {
       expect(address.get('zip')).toBe(12345);
 
       instance.set('address', Address.create({street: '2 Your Street'}));
-      expect(instance.getPath('data.address.street')).toBe('2 Your Street');
-      expect(instance.getPath('data.address.zip')).toBeUndefined();
+      expect(getPath(instance, 'data.address.street')).toBe('2 Your Street');
+      expect(getPath(instance, 'data.address.zip')).toBeUndefined();
     });
 
     it('should support path overriding', function() {
@@ -86,8 +88,8 @@ describe('associations', function() {
       expect(address.get('zip')).toBe(12345);
 
       instance.set('address', Address.create({street: '2 Your Street'}));
-      expect(instance.getPath('data.addresses.home.street')).toBe('2 Your Street');
-      expect(instance.getPath('data.addresses.home.zip')).toBeUndefined();
+      expect(getPath(instance, 'data.addresses.home.street')).toBe('2 Your Street');
+      expect(getPath(instance, 'data.addresses.home.zip')).toBeUndefined();
     });
 
     it('should have an id accessor', function() {
@@ -110,7 +112,7 @@ describe('associations', function() {
 
       expect(instance.get('address_id')).toBe(2);
       expect(instance.get('address')).not.toBe(address);
-      expect(instance.getPath('address.id')).toBe(2);
+      expect(getPath(instance, 'address.id')).toBe(2);
     });
   });
 
@@ -143,7 +145,7 @@ describe('associations', function() {
       it('should support url strings', function() {
         var person = Person.create({id: 1, name: 'Mick Staugaard'});
         var homeAddresses = person.get('home_addresses');
-        
+
         expect(homeAddresses).toBeDefined();
         expect(homeAddresses instanceof Ember.ResourceCollection).toBe(true);
         expect(homeAddresses.type).toBe(Address);
@@ -153,7 +155,7 @@ describe('associations', function() {
       it('should support url functions', function() {
         var person = Person.create({id: 1, name: 'Mick Staugaard'});
         var workAddresses = person.get('work_addresses');
-        
+
         expect(workAddresses).toBeDefined();
         expect(workAddresses instanceof Ember.ResourceCollection).toBe(true);
         expect(workAddresses.type).toBe(Address);

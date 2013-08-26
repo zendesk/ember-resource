@@ -1,4 +1,11 @@
 describe('toJSON', function() {
+  var setPath = (function() {
+    var o = { object: {} };
+    Ember.set(o, 'object.path', 'value');
+    var setSupportsPath = o.object.path === 'value';
+    return setSupportsPath ? Ember.set : Ember.setPath;
+  }());
+
   it('should use toJSON of each of the schema items', function() {
     var Book = Ember.Resource.define({
       schema: {
@@ -50,7 +57,7 @@ describe('toJSON', function() {
           newCity = 'Liverpool',
           newName = 'Smit Johnson';
 
-      Ember.setPath(person, 'address.city', newCity);
+      setPath(person, 'address.city', newCity);
       Ember.set(person, 'name', newName);
 
       var json = person.toJSON();
@@ -111,7 +118,7 @@ describe('toJSON', function() {
 
     it('should not be included', function() {
       var library = Library.create({name: 'The Robarts Library'});
-      Ember.setPath(library, 'books.content', [{ id: 1, title: 'The Hobbit' }]);
+      setPath(library, 'books.content', [{ id: 1, title: 'The Hobbit' }]);
       expect(library.toJSON()).toEqual({ name: 'The Robarts Library' });
     });
   });

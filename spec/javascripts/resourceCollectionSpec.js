@@ -8,15 +8,15 @@ describe('ResourceCollection', function() {
     });
   });
 
-  it("reads from it's url property if present", function() {
+  it("reads from its url property if present", function() {
 
-    var collection = Em.ResourceCollection.create({
+    var collection = Em.ResourceCollection.extend({
       type: Model,
 
       url: function() {
         return '/url/from/collection';
       }.property().cacheable()
-    });
+    }).create();
 
     expect(collection.resolveUrl()).toEqual('/url/from/collection');
   });

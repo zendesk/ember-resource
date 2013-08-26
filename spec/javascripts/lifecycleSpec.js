@@ -143,12 +143,12 @@ describe('Lifecycle', function() {
         state: Ember.Resource.Lifecycle.FETCHED
       });
 
-      obj = Ember.Object.create({
+      obj = Ember.Object.extend({
         person: person,
         isFetchedDidChange: function() {
           called = true;
         }.observes('person.isFetchable')
-      });
+      }).create();
     });
 
     describe('When we expire the person object', function() {

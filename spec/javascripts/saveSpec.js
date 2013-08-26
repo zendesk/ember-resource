@@ -1,5 +1,6 @@
 describe('Saving a resource instance', function() {
-  var Model, model, server;
+  var getPath = Ember.Resource.getPath,
+      Model, model, server;
 
   beforeEach(function() {
     Model = Ember.Resource.define({
@@ -181,7 +182,7 @@ describe('Saving a resource instance', function() {
           resource.save();
           server.respond();
           expect(resource.get('id')).toBe(1);
-          expect(resource.getPath('address.street')).toBe('baz');
+          expect(getPath(resource, 'address.street')).toBe('baz');
         });
       });
     });

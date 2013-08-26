@@ -91,9 +91,9 @@ describe('A Resource instance', function () {
   });
 
   it('allows setting computed properties during creation', function() {
-    model = Model.create({
+    model = Model.extend({
       undefinedProperty: function() { return this.get('foo') + '!'; }.property('foo')
-    });
+    }).create();
     model.set('foo', 'foo');
 
     expect(model.get('undefinedProperty')).toEqual('foo!');

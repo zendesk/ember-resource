@@ -4,7 +4,8 @@
       mergeSchemas;
 
   var Ember = exports.Ember,
-      getPath = Ember.getPath || Ember.get;
+      getPath = Ember.Resource.getPath,
+      set = Ember.set;
 
   function isString(obj) {
     return Ember.typeOf(obj) === 'string';
@@ -32,13 +33,13 @@
     var key = path.shift();
 
     if (path.length === 0) {
-      Ember.set(obj, key, value);
+      set(obj, key, value);
     } else {
       var newObj = Ember.get(obj, key);
 
       if (newObj === null || newObj === undefined) {
         newObj = {};
-        Ember.set(obj, key, newObj);
+        set(obj, key, newObj);
       }
 
       Ember.propertyWillChange(newObj, path);
@@ -60,7 +61,7 @@
           Ember.Resource.deepMerge(oldValue, newValue);
           Ember.propertyDidChange(objA, key);
         } else {
-          Ember.set(objA, key, newValue);
+          set(objA, key, newValue);
         }
       }
     }
@@ -340,7 +341,7 @@
       return getPath(instance, this.get('path'));
     },
     setValue: function(instance, value) {
-      Ember.set(instance, getPath(this, 'association.name'), {id: value});
+      set(instance, getPath(this, 'association.name'), {id: value});
     }
   });
   Ember.Resource.HasOneNestedIdSchemaItem.reopenClass({
@@ -615,7 +616,7 @@
         var instance = this._super.apply(this, arguments);
 
         if (Ember.get(instance, 'resourceState') === Ember.Resource.Lifecycle.INITIALIZING) {
-          Ember.set(instance, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
+          set(instance, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
         }
 
         return instance;
@@ -634,32 +635,32 @@
         var updateExpiry = function () {
           var expireAt = new Date();
           expireAt.setSeconds(expireAt.getSeconds() + Ember.get(self, 'expireIn'));
-          Ember.set(self, 'expireAt', expireAt);
+          set(self, 'expireAt', expireAt);
         };
 
         Ember.addListener(this, 'willFetch', this, function() {
-          Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHING);
+          set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHING);
           updateExpiry();
         });
 
         Ember.addListener(this, 'didFetch', this, function() {
-          Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
+          set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
           updateExpiry();
         });
 
         Ember.addListener(this, 'didFail', this, function() {
-          Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
+          set(self, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
           updateExpiry();
         });
 
         var resourceStateBeforeSave;
         Ember.addListener(this, 'willSave', this, function() {
           resourceStateBeforeSave = Ember.get(self, 'resourceState');
-          Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.SAVING);
+          set(self, 'resourceState', Ember.Resource.Lifecycle.SAVING);
         });
 
         Ember.addListener(this, 'didSave', this, function() {
-          Ember.set(self, 'resourceState', resourceStateBeforeSave || Ember.Resource.Lifecycle.UNFETCHED);
+          set(self, 'resourceState', resourceStateBeforeSave || Ember.Resource.Lifecycle.UNFETCHED);
         });
       },
 
@@ -698,12 +699,12 @@
 
       expire: function () {
         Ember.run.next(this, function () {
-          Ember.set(this, 'expireAt', new Date());
+          set(this, 'expireAt', new Date());
         });
       },
 
       expireNow: function() {
-        Ember.set(this, 'expireAt', new Date());
+        set(this, 'expireAt', new Date());
       },
 
       refresh: function() {
@@ -869,7 +870,7 @@
         if (location) {
           var id = self.constructor.idFromURL(location);
           if (id) {
-            Ember.set(self, 'id', id);
+            set(self, 'id', id);
           }
         }
 
@@ -888,17 +889,17 @@
 
     destroyResource: function() {
       var previousState = Ember.get(this, 'resourceState'), self = this;
-      Ember.set(this, 'resourceState', Ember.Resource.Lifecycle.DESTROYING);
+      set(this, 'resourceState', Ember.Resource.Lifecycle.DESTROYING);
       return Ember.Resource.ajax({
         type: 'DELETE',
         operation: 'destroy',
         url:  this.resourceURL(),
         resource: this
       }).done(function() {
-        Ember.set(self, 'resourceState', Ember.Resource.Lifecycle.DESTROYED);
+        set(self, 'resourceState', Ember.Resource.Lifecycle.DESTROYED);
         self.destroy();
       }).fail(function() {
-        Ember.set(self, 'resourceState', previousState);
+        set(self, 'resourceState', previousState);
       });
     }
   }, Ember.Resource.Lifecycle.prototypeMixin);
@@ -1149,7 +1150,7 @@
 
       this._fetch(ajaxOptions)
         .done(function(json) {
-          Ember.set(self, 'content', self.parse(json));
+          set(self, 'content', self.parse(json));
           self.fetched().resolve(json, self);
           result.resolve(json, self);
         })
@@ -1255,7 +1256,7 @@
         instance = this._super.call(this, options);
 
         if (content) {
-          Ember.set(instance, 'content', instance.parse(content));
+          set(instance, 'content', instance.parse(content));
         }
       }
 
