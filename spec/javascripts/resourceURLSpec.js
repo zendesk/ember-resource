@@ -14,7 +14,7 @@ describe('resourceURL', function() {
       });
 
       it("should append the id to the string", function() {
-        expect(instance.resourceURL()).toEqual("/users/me/1");
+        expect(instance.resourceURL()).to.equal("/users/me/1");
       });
     });
 
@@ -24,7 +24,7 @@ describe('resourceURL', function() {
       });
 
       it("should return the string", function() {
-        expect(instance.resourceURL()).toEqual("/users/me");
+        expect(instance.resourceURL()).to.equal("/users/me");
       });
     });
 
@@ -34,17 +34,17 @@ describe('resourceURL', function() {
       });
 
       it("should not have a URL", function() {
-        expect(instance.resourceURL()).toBeUndefined();
+        expect(instance.resourceURL()).to.be.undefined;
       });
     });
 
     describe('for an instance with a negative ID', function() {
       beforeEach(function() {
-        model = subject.create({ id: -1 });
+        instance = subject.create({ id: -1 });
       });
 
       it('should not have a URL', function() {
-        expect(instance.resourceURL()).toBeUndefined();
+        expect(instance.resourceURL()).to.be.undefined;
       });
     });
   });
@@ -63,10 +63,10 @@ describe('resourceURL', function() {
         instance = subject.create({id: 1});
       });
       it("should return the result of invoking the function with the instance", function() {
-        spyOn(subject, 'url').andCallThrough();
+        sinon.spy(subject, 'url', subject.url.bind(subject));
 
-        expect(instance.resourceURL()).toEqual("/users/1");
-        expect(subject.url).toHaveBeenCalledWith(instance);
+        expect(instance.resourceURL()).to.equal("/users/1");
+        expect(subject.url.calledWith(instance)).to.be.ok;
       });
     });
 

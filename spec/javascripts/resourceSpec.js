@@ -18,22 +18,27 @@ describe('A Resource instance', function () {
     describe("with a sideloads attribute", function() {
       var subject;
       beforeEach(function() {
+        sinon.stub(Ember.Resource, 'ajax').returns($.when());
         subject = Ember.Resource.define({
           url: "/users",
           sideloads: ["abilities", "weapons"]
         });
       });
 
+      afterEach(function() {
+        Ember.Resource.ajax.restore();
+      });
+
       it("should not include the sideloads in resourceURL", function() {
         var user = subject.create({id: 1});
-        expect(user.resourceURL()).toEqual("/users/1");
+        expect(user.resourceURL()).to.equal("/users/1");
       });
 
       it("should send the sideloads in AJAX fetches", function() {
         var user = subject.create({id: 1});
-        spyOn(Ember.Resource, 'ajax').andReturn($.when());
         user.fetch();
-        expect(Ember.Resource.ajax).toHaveBeenCalledWith({
+        expect(Ember.Resource.ajax.callCount).to.equal(1);
+        expect(Ember.Resource.ajax.getCall(0).args[0]).to.deep.equal({
           url: "/users/1",
           resource: user,
           operation: 'read',
@@ -49,16 +54,16 @@ describe('A Resource instance', function () {
     });
 
     it('does not fetch when setting an attribute', function() {
-      spyOn(model, 'fetch');
+      sinon.spy(model, 'fetch');
       model.set('name', 'Patricia');
-      expect(model.fetch).not.toHaveBeenCalled();
+      expect(model.fetch.callCount).to.equal(0);
     });
 
     it('allows setting a property to undefined', function() {
       model.set('name', 'Carlos');
-      expect(model.get('name')).toEqual('Carlos');
+      expect(model.get('name')).to.equal('Carlos');
       model.set('name', undefined);
-      expect(model.get('name')).toBeUndefined();
+      expect(model.get('name')).to.be.undefined;
     });
   });
 
@@ -67,7 +72,7 @@ describe('A Resource instance', function () {
       undefinedProperty: 'foo'
     });
 
-    expect(model.get('undefinedProperty')).toEqual('foo');
+    expect(model.get('undefinedProperty')).to.equal('foo');
   });
 
   it('allows setting functions during creation', function() {
@@ -75,8 +80,8 @@ describe('A Resource instance', function () {
       undefinedProperty: function() { return 'foo'; }
     });
 
-    expect(Ember.typeOf(model.undefinedProperty)).toEqual('function');
-    expect(model.undefinedProperty()).toEqual('foo');
+    expect(Ember.typeOf(model.undefinedProperty)).to.equal('function');
+    expect(model.undefinedProperty()).to.equal('foo');
   });
 
   it('allows setting observers during creation', function() {
@@ -87,7 +92,7 @@ describe('A Resource instance', function () {
     observerDidFire = false;
     model.set('foo', 'new value');
 
-    expect(observerDidFire).toBe(true);
+    expect(observerDidFire).to.equal(true);
   });
 
   it('allows setting computed properties during creation', function() {
@@ -96,7 +101,7 @@ describe('A Resource instance', function () {
     }).create();
     model.set('foo', 'foo');
 
-    expect(model.get('undefinedProperty')).toEqual('foo!');
+    expect(model.get('undefinedProperty')).to.equal('foo!');
   });
 
   it('allows setting of properties not in the schema during creation, considering paths', function() {
@@ -118,10 +123,10 @@ describe('A Resource instance', function () {
     });
 
     it('should update objects in the identity map with new data', function() {
-      expect(model.get('subject')).toBeUndefined();
+      expect(model.get('subject')).to.be.undefined;
       model = Model.create({id: 1, name: 'boo', subject: 'bar'});
-      expect(model.get('name')).toBe('boo');
-      expect(model.get('subject')).toBe('bar');
+      expect(model.get('name')).to.equal('boo');
+      expect(model.get('subject')).to.equal('bar');
     });
   });
 
@@ -131,11 +136,11 @@ describe('A Resource instance', function () {
     });
 
     it('should execute callbacks with the property name and new value', function() {
-      spyOn(model, 'resourcePropertyWillChange');
-      spyOn(model, 'resourcePropertyDidChange');
+      sinon.spy(model, 'resourcePropertyWillChange');
+      sinon.spy(model, 'resourcePropertyDidChange');
       model.set('name', 'Zebra');
-      expect(model.resourcePropertyWillChange).toHaveBeenCalledWith('name', 'Zebra');
-      expect(model.resourcePropertyDidChange).toHaveBeenCalledWith('name', 'Zebra');
+      expect(model.resourcePropertyWillChange.calledWith('name', 'Zebra')).to.be.ok;
+      expect(model.resourcePropertyDidChange.calledWith('name', 'Zebra')).to.be.ok;
     });
   });
 
@@ -160,7 +165,7 @@ describe('A Resource instance', function () {
         });
 
         it("fires an observer once and only once", function() {
-          expect(count).toEqual(1);
+          expect(count).to.equal(1);
         });
       });
     });
@@ -170,7 +175,7 @@ describe('A Resource instance', function () {
     beforeEach(function() {
       model = Model.create();
       model.set('data', undefined);
-      expect(Ember.get(model, 'data')).toBe(undefined);
+      expect(Ember.get(model, 'data')).to.be.undefined;
     });
 
     describe('updating that model with api data', function() {
@@ -181,38 +186,40 @@ describe('A Resource instance', function () {
   });
 
   describe('Given a model that expires five minutes from now', function() {
-    var time;
     beforeEach(function() {
-      time = new Date();
-      time.setSeconds(time.getSeconds() + (60*5));
+      var now = new Date(),
+          fiveMinutesFromNow = new Date(+now + 5 * 60 * 1000);
       model = Model.create();
-      model.set('expireAt', time);
-      expect(model.get('isExpired')).toBeFalsy();
+      Ember.run(model.set.bind(model, 'expireAt', fiveMinutesFromNow));
+    });
+
+    it('is not expired', function() {
+      expect(model.get('isExpired')).to.not.be.ok;
     });
 
     describe('Calling expire now', function() {
       beforeEach(function() {
-        model.expireNow();
+        Ember.run(model.expireNow.bind(model));
       });
 
       it('expires the model', function() {
-        expect(model.get('isExpired')).toBeTruthy();
+        expect(model.get('isExpired')).to.be.ok;
       });
     });
 
     describe('Calling refresh', function() {
       beforeEach(function() {
-        model = Model.create();
-        spyOn(model, 'fetch');
+        sinon.spy(model, 'fetch');
+        sinon.spy(model, 'expireNow');
         model.refresh();
       });
 
       it('expires the model', function() {
-        expect(model.get('isExpired')).toBeTruthy();
+        expect(model.expireNow.callCount).to.equal(1);
       });
 
       it('fetches the model', function() {
-        expect(model.fetch).toHaveBeenCalled();
+        expect(model.fetch.callCount).to.equal(1);
       });
     });
   });
@@ -226,7 +233,7 @@ describe('A Resource instance', function () {
 
     it("should change the schema", function() {
       model = Model.create({description: "Boo"});
-      expect(model.toJSON().description).toEqual("Boo");
+      expect(model.toJSON().description).to.equal("Boo");
     });
   });
 });

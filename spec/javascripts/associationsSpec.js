@@ -27,12 +27,12 @@ describe('associations', function() {
         }
       });
       subject = Person.create({}, { "address_id": 1 });
-      spyOn(subject, 'updateWithApiData');
+      sinon.spy(subject, 'updateWithApiData');
       subject.get('address');
     });
 
     it("shouldn't call updateWithApiData when getting resource", function() {
-      expect(subject.updateWithApiData).not.toHaveBeenCalled();
+      expect(subject.updateWithApiData.callCount).to.equal(0);
     });
   });
 
@@ -60,13 +60,13 @@ describe('associations', function() {
       var instance = Person.create({}, data);
       var address  = instance.get('address');
 
-      expect(address instanceof Address).toBe(true);
-      expect(address.get('street')).toBe('1 My Street');
-      expect(address.get('zip')).toBe(12345);
+      expect(address instanceof Address).to.equal(true);
+      expect(address.get('street')).to.equal('1 My Street');
+      expect(address.get('zip')).to.equal(12345);
 
       instance.set('address', Address.create({street: '2 Your Street'}));
-      expect(getPath(instance, 'data.address.street')).toBe('2 Your Street');
-      expect(getPath(instance, 'data.address.zip')).toBeUndefined();
+      expect(getPath(instance, 'data.address.street')).to.equal('2 Your Street');
+      expect(getPath(instance, 'data.address.zip')).to.be.undefined;
     });
 
     it('should support path overriding', function() {
@@ -83,13 +83,13 @@ describe('associations', function() {
       var instance = Person.create({}, data);
       var address  = instance.get('address');
 
-      expect(address instanceof Address).toBe(true);
-      expect(address.get('street')).toBe('1 My Street');
-      expect(address.get('zip')).toBe(12345);
+      expect(address instanceof Address).to.equal(true);
+      expect(address.get('street')).to.equal('1 My Street');
+      expect(address.get('zip')).to.equal(12345);
 
       instance.set('address', Address.create({street: '2 Your Street'}));
-      expect(getPath(instance, 'data.addresses.home.street')).toBe('2 Your Street');
-      expect(getPath(instance, 'data.addresses.home.zip')).toBeUndefined();
+      expect(getPath(instance, 'data.addresses.home.street')).to.equal('2 Your Street');
+      expect(getPath(instance, 'data.addresses.home.zip')).to.be.undefined;
     });
 
     it('should have an id accessor', function() {
@@ -106,13 +106,13 @@ describe('associations', function() {
       data = instance.get('data');
       var address  = instance.get('address');
 
-      expect(instance.get('address_id')).toBe(1);
+      expect(instance.get('address_id')).to.equal(1);
 
       instance.set('address_id', '2');
 
-      expect(instance.get('address_id')).toBe(2);
-      expect(instance.get('address')).not.toBe(address);
-      expect(getPath(instance, 'address.id')).toBe(2);
+      expect(instance.get('address_id')).to.equal(2);
+      expect(instance.get('address')).not.to.equal(address);
+      expect(getPath(instance, 'address.id')).to.equal(2);
     });
   });
 
@@ -146,20 +146,20 @@ describe('associations', function() {
         var person = Person.create({id: 1, name: 'Mick Staugaard'});
         var homeAddresses = person.get('home_addresses');
 
-        expect(homeAddresses).toBeDefined();
-        expect(homeAddresses instanceof Ember.ResourceCollection).toBe(true);
-        expect(homeAddresses.type).toBe(Address);
-        expect(homeAddresses.url).toBe('/people/1/addresses');
+        expect(homeAddresses).to.not.equal(undefined);
+        expect(homeAddresses instanceof Ember.ResourceCollection).to.equal(true);
+        expect(homeAddresses.type).to.equal(Address);
+        expect(homeAddresses.url).to.equal('/people/1/addresses');
       });
 
       it('should support url functions', function() {
         var person = Person.create({id: 1, name: 'Mick Staugaard'});
         var workAddresses = person.get('work_addresses');
 
-        expect(workAddresses).toBeDefined();
-        expect(workAddresses instanceof Ember.ResourceCollection).toBe(true);
-        expect(workAddresses.type).toBe(Address);
-        expect(workAddresses.url).toBe('/people/1/addresses');
+        expect(workAddresses).to.not.equal(undefined);
+        expect(workAddresses instanceof Ember.ResourceCollection).to.equal(true);
+        expect(workAddresses.type).to.equal(Address);
+        expect(workAddresses.url).to.equal('/people/1/addresses');
       });
     });
 
@@ -201,24 +201,24 @@ describe('associations', function() {
         var person = Person.create({}, data);
         var homeAddresses = person.get('home_addresses');
 
-        expect(homeAddresses).toBeDefined();
-        expect(homeAddresses instanceof Ember.ResourceCollection).toBe(true);
-        expect(homeAddresses.type).toBe(Address);
-        expect(homeAddresses.get('length')).toBe(2);
+        expect(homeAddresses).to.not.equal(undefined);
+        expect(homeAddresses instanceof Ember.ResourceCollection).to.equal(true);
+        expect(homeAddresses.type).to.equal(Address);
+        expect(homeAddresses.get('length')).to.equal(2);
 
         var address;
         for (var i=0; i < data.home_addresses.length; i++) {
           address = homeAddresses.objectAt(i);
-          expect(address).toBeDefined();
-          expect(address instanceof Address).toBe(true);
-          expect(address.get('street')).toBe(data.home_addresses[i].street);
-          expect(address.get('zip')).toBe(data.home_addresses[i].zip);
+          expect(address).to.not.equal(undefined);
+          expect(address instanceof Address).to.equal(true);
+          expect(address.get('street')).to.equal(data.home_addresses[i].street);
+          expect(address.get('zip')).to.equal(data.home_addresses[i].zip);
         }
 
         address = homeAddresses.objectAt(0);
 
         address.set('street', '3 Other Street');
-        expect(address.get('street')).toBe('3 Other Street');
+        expect(address.get('street')).to.equal('3 Other Street');
       });
 
       it("should use the class's parse method", function() {
@@ -236,8 +236,8 @@ describe('associations', function() {
         var person = Person.create({}, data),
             address = person.get('home_addresses').objectAt(0);
 
-        expect(address).toBeTruthy();
-        expect(address.get('city')).toEqual('Anytown');
+        expect(address).to.be.ok;
+        expect(address.get('city')).to.equal('Anytown');
       });
     });
 
@@ -264,9 +264,9 @@ describe('associations', function() {
         var person    = Person.create({}, data),
             addresses = person.get('home_addresses');
 
-        expect(addresses.get('length')).toBe(2);
-        expect(addresses.objectAt(0).get('id')).toBe(1);
-        expect(addresses.objectAt(1).get('id')).toBe(2);
+        expect(addresses.get('length')).to.equal(2);
+        expect(addresses.objectAt(0).get('id')).to.equal(1);
+        expect(addresses.objectAt(1).get('id')).to.equal(2);
       });
     });
 

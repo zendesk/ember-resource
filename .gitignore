@@ -1,6 +1,4 @@
-Gemfile.lock
-.jhw-cache
-tmp
-node_modules
+/.jhw-cache
 /dist
-.ruby-version
+/node_modules
+/tmp
