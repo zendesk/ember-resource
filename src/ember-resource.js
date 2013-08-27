@@ -1200,7 +1200,7 @@
     parse: function(json) {
       this._resolveType();
       if (Ember.typeOf(this.type.parse) == 'function') {
-        return json.map(this.type.parse);
+        return json.map(this.type.parse, this);
       }
       else {
         return json;
