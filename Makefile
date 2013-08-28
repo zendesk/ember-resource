@@ -7,6 +7,7 @@ dist: $(DIST_JS)
 ci: dist
 
 $(DIST_JS): jshint
+	mkdir -p dist
 	cat src/vendor/lru.js src/base.js src/remote_expiry.js src/identity_map.js src/ember-resource.js > $@
 
 jshint: npm_install
