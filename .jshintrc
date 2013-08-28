@@ -1,6 +1,6 @@
 {
   "predef":   [
-                "$", "SC", "Ember", "Em", "_",
+                "$", "Ember", "Em", "_",
                 "describe", "beforeEach", "afterEach", "it", "expect", "sinon"
               ],
 
