@@ -4,6 +4,7 @@ describe('ResourceCollection', function() {
   var Model;
   beforeEach(function() {
     Model = Em.Resource.define({
+      schema: { name: String },
       url: '/url/from/resource'
     });
   });
@@ -19,6 +20,18 @@ describe('ResourceCollection', function() {
     }).create();
 
     expect(collection.resolveUrl()).toEqual('/url/from/collection');
+  });
+
+  describe('.parse', function() {
+    it("uses the model's parse method", function() {
+      Model.toString = function() { return 'Model'; };
+      Model.parse = function(json) { return { name: this + ' ' + json.name }; };
+      var collection = Em.ResourceCollection.create({
+        type: Model,
+        content: [ { name: 'instance' } ]
+      });
+      expect(collection.objectAt(0).get('name')).toBe('Model instance');
+    });
   });
 
   describe("when prepopulated", function() {
