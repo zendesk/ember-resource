@@ -20,6 +20,9 @@ npm_install:
 	npm install
 
 clean:
-	rm -f dist/*
+	rm -rf ./dist
 
-.PHONY: dist ci jshint test npm_install clean
+clobber: clean
+	rm -rf ./node_modules
+
+.PHONY: dist ci jshint test npm_install clean clobber
