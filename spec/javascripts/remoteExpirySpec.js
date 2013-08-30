@@ -1,4 +1,3 @@
-/*globals Ember, jasmine */
 describe('remote expiry', function() {
   var Resource;
   describe('on a resource with a remote expiry key', function() {
@@ -7,13 +6,13 @@ describe('remote expiry', function() {
         remoteExpiryKey: "foo"
       });
       this.resource = Resource.create();
-      spyOn(this.resource, 'subscribeForExpiry');
+      sinon.spy(this.resource, 'subscribeForExpiry');
     });
 
     it('should subscribe for expiry on fetch', function() {
       Ember.sendEvent(this.resource, 'didFetch');
       Ember.run.sync();
-      expect(this.resource.subscribeForExpiry).toHaveBeenCalled();
+      expect(this.resource.subscribeForExpiry.callCount).to.equal(1);
     });
   });
 
@@ -21,13 +20,13 @@ describe('remote expiry', function() {
     beforeEach(function() {
       Resource = Ember.Resource.define().extend();
       this.resource = Resource.create();
-      spyOn(this.resource, 'subscribeForExpiry');
+      sinon.spy(this.resource, 'subscribeForExpiry');
     });
 
     it('should not subscribe for expiry on fetch', function() {
       Ember.sendEvent(this.resource, 'didFetch');
       Ember.run.sync();
-      expect(this.resource.subscribeForExpiry).not.toHaveBeenCalled();
+      expect(this.resource.subscribeForExpiry.callCount).to.equal(0);
     });
   });
 
@@ -37,23 +36,29 @@ describe('remote expiry', function() {
         remoteExpiryKey: "foo"
       });
       this.resource = Resource.create();
-      this.spy = spyOn(Ember.Resource.PushTransport, 'subscribe');
+      this.spy = sinon.stub(Ember.Resource.PushTransport, 'subscribe');
       Ember.sendEvent(this.resource, 'didFetch');
       Ember.run.sync();
     });
 
+    afterEach(function() {
+      Ember.Resource.PushTransport.subscribe.restore();
+    });
+
     it('should use the PushTransport', function() {
-      expect(Ember.Resource.PushTransport.subscribe).toHaveBeenCalledWith("foo", jasmine.any(Function));
+      expect(this.spy.callCount).to.equal(1);
+      expect(this.spy.getCall(0).args[0]).to.equal('foo');
+      expect(typeof this.spy.getCall(0).args[1]).to.equal('function');
     });
 
     it('should subscribe to Ember.Resource.PushTransport', function() {
-      expect(this.spy.callCount).toEqual(1);
+      expect(this.spy.callCount).to.equal(1);
     });
 
     it('should not subscribe more than once', function() {
       Ember.sendEvent(this.resource, 'didFetch');
       Ember.run.sync();
-      expect(this.spy.callCount).toEqual(1);
+      expect(this.spy.callCount).to.equal(1);
     });
   });
 
@@ -64,15 +69,15 @@ describe('remote expiry', function() {
       });
       this.resource = Resource.create();
       this.date = 1345511310;
-      spyOn(this.resource, 'expire');
-      spyOn(this.resource, 'fetch');
+      sinon.spy(this.resource, 'expire');
+      sinon.spy(this.resource, 'fetch');
     });
 
     it('should expire resource when stale', function() {
       this.resource.updateExpiry({
         updatedAt: this.date
       });
-      expect(this.resource.expire).toHaveBeenCalled();
+      expect(this.resource.expire.callCount).to.equal(1);
     });
 
     it('should not expire resource when fresh', function() {
@@ -80,12 +85,12 @@ describe('remote expiry', function() {
       this.resource.updateExpiry({
         updatedAt: this.date
       });
-      expect(this.resource.expire).not.toHaveBeenCalled();
+      expect(this.resource.expire.callCount).to.equal(0);
     });
 
     it('should not expire resource when message is malformed', function() {
       this.resource.updateExpiry({});
-      expect(this.resource.expire).not.toHaveBeenCalled();
+      expect(this.resource.expire.callCount).to.equal(0);
     });
 
     describe("with remote expiry auto fetch", function() {
@@ -93,20 +98,20 @@ describe('remote expiry', function() {
         this.resource.set('remoteExpiryAutoFetch', true);
       });
 
-      it('should refetch resource when stale', function() {
+      it('should refetch resource when stale', function(done) {
         var resource = this.resource;
 
-        this.resource.updateExpiry({
-          updatedAt: this.date
-        });
+        Ember.run(function() {
+          this.resource.updateExpiry({
+            updatedAt: this.date
+          });
+        }.bind(this));
 
-        waitsFor(function() {
-          return resource.get('isExpired');
-        }, 'resource never expired', 1000);
-
-        runs(function() {
-          expect(this.resource.fetch).toHaveBeenCalled();
-          expect(this.resource.expire).not.toHaveBeenCalled();
+        Ember.run(function() {
+          expect(resource.get('isExpired')).to.be.ok;
+          expect(resource.fetch.callCount).to.equal(1);
+          expect(resource.expire.callCount).to.equal(0);
+          done();
         });
       });
 
@@ -115,14 +120,14 @@ describe('remote expiry', function() {
         this.resource.updateExpiry({
           updatedAt: this.date
         });
-        expect(this.resource.expire).not.toHaveBeenCalled();
-        expect(this.resource.fetch).not.toHaveBeenCalled();
+        expect(this.resource.expire.callCount).to.equal(0);
+        expect(this.resource.fetch.callCount).to.equal(0);
       });
 
       it('should not refetch resource when message is malformed', function() {
         this.resource.updateExpiry({});
-        expect(this.resource.expire).not.toHaveBeenCalled();
-        expect(this.resource.fetch).not.toHaveBeenCalled();
+        expect(this.resource.expire.callCount).to.equal(0);
+        expect(this.resource.fetch.callCount).to.equal(0);
       });
     });
   });

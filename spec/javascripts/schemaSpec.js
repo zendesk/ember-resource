@@ -18,31 +18,31 @@ describe('schema definition', function() {
     });
 
     it('should use the specified path if given', function() {
-      expect(Model.schema.id.path).toBe('somewhere.deep.id');
+      expect(Model.schema.id.path).to.equal('somewhere.deep.id');
     });
 
     it('should use the attribute name as path if not specified', function() {
-      expect(Model.schema.size.path).toBe('size');
+      expect(Model.schema.size.path).to.equal('size');
     });
 
     it('should support Number', function() {
-      expect(Model.schema.age.get('type')).toBe(Number);
-      expect(Model.schema.age.path).toBe('age');
+      expect(Model.schema.age.get('type')).to.equal(Number);
+      expect(Model.schema.age.path).to.equal('age');
     });
 
     it('should support String', function() {
-      expect(Model.schema.name.get('type')).toBe(String);
-      expect(Model.schema.name.path).toBe('name');
+      expect(Model.schema.name.get('type')).to.equal(String);
+      expect(Model.schema.name.path).to.equal('name');
     });
 
     it('should support Date', function() {
-      expect(Model.schema.birthday.get('type')).toBe(Date);
-      expect(Model.schema.birthday.path).toBe('birthday');
+      expect(Model.schema.birthday.get('type')).to.equal(Date);
+      expect(Model.schema.birthday.path).to.equal('birthday');
     });
 
     it('should support Boolean', function() {
-      expect(Model.schema.single.get('type')).toBe(Boolean);
-      expect(Model.schema.single.path).toBe('single');
+      expect(Model.schema.single.get('type')).to.equal(Boolean);
+      expect(Model.schema.single.path).to.equal('single');
     });
   });
 
@@ -68,29 +68,29 @@ describe('schema definition', function() {
     });
 
     it('should use the specified path when given', function() {
-      expect(Model.schema.work_address.get('path')).toBe('work_addr_id');
+      expect(Model.schema.work_address.get('path')).to.equal('work_addr_id');
     });
 
     it('should guess a path from the name when not given', function() {
-      expect(Model.schema.home_address.get('path')).toBe('home_address_id');
+      expect(Model.schema.home_address.get('path')).to.equal('home_address_id');
     });
 
     it('should define a Number attribute at the path if not present', function() {
-      expect(Model.schema.home_address_id).toBeDefined();
-      expect(Model.schema.home_address_id.get('type')).toBe(Number);
+      expect(Model.schema.home_address_id).to.not.equal(undefined);
+      expect(Model.schema.home_address_id.get('type')).to.equal(Number);
     });
 
     it('should not override the attribute at the path if present', function() {
-      expect(Model.schema.work_addr_id).toBeDefined();
-      expect(Model.schema.work_addr_id.get('type')).toBe(String);
+      expect(Model.schema.work_addr_id).to.not.equal(undefined);
+      expect(Model.schema.work_addr_id.get('type')).to.equal(String);
     });
 
     it('should create an *_id attribute for nested associations', function() {
-      expect(Model.schema.other_address).toBeDefined();
-      expect(Model.schema.other_address_id).toBeDefined();
-      expect(Model.schema.other_address_id instanceof Ember.Resource.HasOneNestedIdSchemaItem).toBe(true);
-      expect(Model.schema.other_address_id.get('association')).toBe(Model.schema.other_address);
-      expect(Model.schema.other_address_id.get('path')).toBe('other_address.id');
+      expect(Model.schema.other_address).to.not.equal(undefined);
+      expect(Model.schema.other_address_id).to.not.equal(undefined);
+      expect(Model.schema.other_address_id instanceof Ember.Resource.HasOneNestedIdSchemaItem).to.equal(true);
+      expect(Model.schema.other_address_id.get('association')).to.equal(Model.schema.other_address);
+      expect(Model.schema.other_address_id.get('path')).to.equal('other_address.id');
     });
   });
 
@@ -105,22 +105,22 @@ describe('schema definition', function() {
     var instance = Model.create({}, data);
     data = instance.get('data');
 
-    expect(instance.get('id')).toBe(1);
-    expect(instance.get('size')).toBe(5);
+    expect(instance.get('id')).to.equal(1);
+    expect(instance.get('size')).to.equal(5);
 
     instance.set('id', '2');
-    expect(getPath(instance, 'data.id')).toBe(2);
+    expect(getPath(instance, 'data.id')).to.equal(2);
 
     instance.set('size', 3);
-    expect(getPath(instance, 'data.size')).toBe(3);
+    expect(getPath(instance, 'data.size')).to.equal(3);
 
     instance.set('size', 'foo');
-    expect(instance.get('size')).toBeUndefined();
-    expect(getPath(instance, 'data.size')).toBeUndefined();
+    expect(instance.get('size')).to.be.undefined;
+    expect(getPath(instance, 'data.size')).to.be.undefined;
 
     instance.set('size', NaN);
-    expect(instance.get('size')).toBeUndefined();
-    expect(getPath(instance, 'data.size')).toBeUndefined();
+    expect(instance.get('size')).to.be.undefined;
+    expect(getPath(instance, 'data.size')).to.be.undefined;
   });
 
   it('should create String properties', function() {
@@ -134,14 +134,14 @@ describe('schema definition', function() {
     var instance = Model.create({}, data);
     data = instance.get('data');
 
-    expect(instance.get('id')).toBe('1');
-    expect(instance.get('size')).toBe('large');
+    expect(instance.get('id')).to.equal('1');
+    expect(instance.get('size')).to.equal('large');
 
     instance.set('id', 2);
-    expect(getPath(instance, 'data.id')).toBe('2');
+    expect(getPath(instance, 'data.id')).to.equal('2');
 
     instance.set('size', 'small');
-    expect(getPath(instance, 'data.size')).toBe('small');
+    expect(getPath(instance, 'data.size')).to.equal('small');
   });
 
   it('should create Date properties', function() {
@@ -158,17 +158,17 @@ describe('schema definition', function() {
     var instance = Model.create({}, data);
     data = instance.get('data');
 
-    expect(instance.get('createdAt')).toEqual(date);
-    expect(instance.get('updatedAt')).toEqual(date);
+    expect(+instance.get('createdAt')).to.equal(+date);
+    expect(+instance.get('updatedAt')).to.equal(+date);
 
     date = new Date();
     dateString = date.toJSON();
 
     instance.set('createdAt', date);
-    expect(getPath(instance, 'data.createdAt')).toEqual(dateString, "convert a Date instance to a string");
+    expect(getPath(instance, 'data.createdAt')).to.equal(dateString, "convert a Date instance to a string");
 
     instance.set('updatedAt', dateString);
-    expect(getPath(instance, 'data.updatedAt')).toEqual(dateString, 'convert a string ("' + dateString + '") to a string');
+    expect(getPath(instance, 'data.updatedAt')).to.equal(dateString, 'convert a string ("' + dateString + '") to a string');
   });
 
   it('should create Boolean properties', function() {
@@ -184,21 +184,21 @@ describe('schema definition', function() {
     var instance = Model.create({}, data);
     data = instance.get('data');
 
-    expect(instance.get('public')).toBe(true);
-    expect(instance.get('active')).toBe(false);
-    expect(instance.get('good')).toBe(true);
-    expect(instance.get('bad')).toBe(false);
+    expect(instance.get('public')).to.equal(true);
+    expect(instance.get('active')).to.equal(false);
+    expect(instance.get('good')).to.equal(true);
+    expect(instance.get('bad')).to.equal(false);
 
     instance.set('public', 'true');
-    expect(getPath(instance, 'data.public')).toBe(true, "convert 'true' to true");
+    expect(getPath(instance, 'data.public')).to.equal(true, "convert 'true' to true");
 
     instance.set('public', 'false');
-    expect(getPath(instance, 'data.public')).toBe(false, "convert 'false' to false");
+    expect(getPath(instance, 'data.public')).to.equal(false, "convert 'false' to false");
 
     instance.set('public', true);
-    expect(getPath(instance, 'data.public')).toBe(true, "convert true to true");
+    expect(getPath(instance, 'data.public')).to.equal(true, "convert true to true");
 
     instance.set('public', false);
-    expect(getPath(instance, 'data.public')).toBe(false, "convert false to false");
+    expect(getPath(instance, 'data.public')).to.equal(false, "convert false to false");
   });
 });

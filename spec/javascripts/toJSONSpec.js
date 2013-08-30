@@ -16,15 +16,15 @@ describe('toJSON', function() {
 
     var book = Book.create({id: 1, title: 'Rework'});
 
-    spyOn(Book.schema.id,    'toJSON').andReturn(1);
-    spyOn(Book.schema.title, 'toJSON').andReturn(undefined);
+    sinon.stub(Book.schema.id,    'toJSON').returns(1);
+    sinon.stub(Book.schema.title, 'toJSON').returns(undefined);
 
     var json = book.toJSON();
 
-    expect(Book.schema.id.toJSON).toHaveBeenCalledWith(book);
-    expect(Book.schema.title.toJSON).toHaveBeenCalledWith(book);
+    expect(Book.schema.id.toJSON.calledWith(book)).to.be.ok;
+    expect(Book.schema.title.toJSON.calledWith(book)).to.be.ok;
 
-    expect(json).toEqual({id: 1});
+    expect(json).to.deep.equal({id: 1});
   });
 
   describe('nested objects', function() {
@@ -62,7 +62,7 @@ describe('toJSON', function() {
 
       var json = person.toJSON();
 
-      expect(json).toEqual({
+      expect(json).to.deep.equal({
         name: newName,
         address: { city: newCity }
       });
@@ -90,8 +90,8 @@ describe('toJSON', function() {
       var person  = Person.create({id: 1, name: 'Mick Staugaard', address: address});
 
       var json = person.toJSON();
-      expect(json.address).toBeUndefined();
-      expect(json.address_id).toBe(1);
+      expect(json.address).to.be.undefined;
+      expect(json.address_id).to.equal(1);
     });
 
   });
@@ -119,7 +119,7 @@ describe('toJSON', function() {
     it('should not be included', function() {
       var library = Library.create({name: 'The Robarts Library'});
       setPath(library, 'books.content', [{ id: 1, title: 'The Hobbit' }]);
-      expect(library.toJSON()).toEqual({ name: 'The Robarts Library' });
+      expect(library.toJSON()).to.deep.equal({ name: 'The Robarts Library' });
     });
   });
 
@@ -148,10 +148,10 @@ describe('toJSON', function() {
         books_ids: [1,2,3]
       });
 
-      expect(library.toJSON()).toEqual({
+      expect(library.toJSON()).to.deep.equal({
         name: 'The Robarts Library',
         books_ids: [1,2,3]
       });
-    })
+    });
   });
 });
