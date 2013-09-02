@@ -85,12 +85,19 @@ describe('schema definition', function() {
       expect(Model.schema.work_addr_id.get('type')).toBe(String);
     });
 
-    it('should create an *_id attribute for nested associations', function() {
-      expect(Model.schema.other_address).toBeDefined();
-      expect(Model.schema.other_address_id).toBeDefined();
-      expect(Model.schema.other_address_id instanceof Ember.Resource.HasOneNestedIdSchemaItem).toBe(true);
-      expect(Model.schema.other_address_id.get('association')).toBe(Model.schema.other_address);
-      expect(Model.schema.other_address_id.get('path')).toBe('other_address.id');
+    describe("with generated *_id attribute for nested associations", function() {
+      it('should be created', function() {
+        expect(Model.schema.other_address).toBeDefined();
+        expect(Model.schema.other_address_id).toBeDefined();
+        expect(Model.schema.other_address_id instanceof Ember.Resource.HasOneNestedIdSchemaItem).toBe(true);
+        expect(Model.schema.other_address_id.get('association')).toBe(Model.schema.other_address);
+        expect(Model.schema.other_address_id.get('path')).toBe('other_address.id');
+      });
+
+      it("should have parent association as a dependency", function() {
+        expect(Model.schema.other_address_id.get('dependencies')).toContain('other_address');
+        expect(Model.schema.other_address_id.get('dependencies')).toContain('_new_data');
+      });
     });
   });
 

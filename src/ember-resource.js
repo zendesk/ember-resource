@@ -322,14 +322,19 @@
   });
   Ember.Resource.HasOneNestedSchemaItem.reopenClass({
     create: function(name, schema) {
-      var definition = schema[name];
-      var instance = this._super.apply(this, arguments);
-      instance.set('path', definition.path || name);
+      var definition = schema[name],
+          instance   = this._super.apply(this, arguments),
+          path       = definition.path || name,
+          id_name    = name + '_id';
 
-      var id_name = name + '_id';
+      instance.set('path', path);
+
       if (!schema[id_name]) {
-        schema[id_name] = {type: Number, association: instance };
-        schema[id_name] = Ember.Resource.HasOneNestedIdSchemaItem.create(id_name, schema);
+        var dependencies   = { dependencies: [ path, '_new_data' ] },
+            NestedIdSchema = Ember.Resource.HasOneNestedIdSchemaItem.extend(dependencies);
+
+        schema[id_name] = { type: Number, association: instance };
+        schema[id_name] = NestedIdSchema.create(id_name, schema);
       }
 
       return instance;
