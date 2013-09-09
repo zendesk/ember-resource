@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script>window.TestNamespace = undefined;</script>
+    <!-- vendor: -->
+    <script src="../vendor/jquery-1.7.js"></script>
+    <script src="../vendor/ember-0.9.8.1.js"></script>
+
+    <!-- lib: -->
+    <script src="../src/vendor/lru.js"></script>
+    <script src="../src/base.js"></script>
+    <script src="../src/remote_expiry.js"></script>
+    <script src="../src/identity_map.js"></script>
+    <script src="../src/ember-resource.js"></script>
+    <link rel="stylesheet" href="../node_modules/mocha-phantomjs/node_modules/mocha/mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <!-- test support: -->
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/mocha-phantomjs/node_modules/mocha/mocha.js"></script>
+    <script src="../vendor/sinon.js"></script>
+    <script>
+      expect = chai.expect;
+      mocha.ui('bdd');
+      mocha.reporter('html');
+    </script>
+
+    <!-- specs: -->
+    <script type="text/javascript" src="../spec/javascripts/associationsSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/deepMergeSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/deepSetSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/destroySpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/fetchSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/identityMapSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/inheritanceSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/lifecycleSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/remoteExpirySpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/resourceCollectionSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/resourceSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/resourceURLSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/saveSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/schemaSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/toJSONSpec.js"></script>
+    <script type="text/javascript" src="../spec/javascripts/lookUpTypeSpec.js"></script>
+    <script>
+      if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+      else { mocha.run(); }
+    </script>
+  </body>
+</html>

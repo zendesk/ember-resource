@@ -1,11 +1,17 @@
 describe('lookUpType', function() {
 
+  afterEach(function() {
+    var unstub = Ember.Resource.lookUpType.restore;
+    unstub && unstub();
+  });
+
   describe('by default', function() {
     var Type,
         lookup = Ember.lookup || window;
 
     beforeEach(function() {
       Type = Ember.Object.extend();
+      Type.toString = function() { return 'Type'; };
       lookup.TestNamespace = { MyType: Type };
     });
 
@@ -14,13 +20,13 @@ describe('lookUpType', function() {
     });
 
     it('looks up types as globals', function() {
-      expect( Ember.Resource.lookUpType('TestNamespace.MyType') ).toBe(Type);
+      expect( Ember.Resource.lookUpType('TestNamespace.MyType') ).to.equal(Type);
     });
   });
 
   it('is used to look up type strings in schemas', function() {
     var Child = Ember.Resource.define({ schema: { id: Number }});
-    spyOn(Ember.Resource, 'lookUpType').andReturn(Child);
+    sinon.stub(Ember.Resource, 'lookUpType').returns(Child);
 
     var child = Ember.Resource.define({
       schema: {
@@ -28,8 +34,8 @@ describe('lookUpType', function() {
       }
     }).create({}, { child: { id: 4 } }).get('child');
 
-    expect( child instanceof Child ).toBeTruthy();
-    expect(child.get('id')).toBe(4);
+    expect( child instanceof Child ).to.be.ok;
+    expect(child.get('id')).to.equal(4);
   });
 
 });

@@ -19,7 +19,7 @@ describe('ResourceCollection', function() {
       }.property().cacheable()
     }).create();
 
-    expect(collection.resolveUrl()).toEqual('/url/from/collection');
+    expect(collection.resolveUrl()).to.equal('/url/from/collection');
   });
 
   describe('.parse', function() {
@@ -44,13 +44,13 @@ describe('ResourceCollection', function() {
     });
 
     it('knows it is prePopulated', function() {
-      expect(this.collection.get('prePopulated')).toBeTruthy();
+      expect(this.collection.get('prePopulated')).to.be.ok;
     });
 
     it('returns a resolved deferred for #fetch', function() {
       var result = this.collection.fetch();
-      expect(result).not.toBeUndefined();
-      expect(result.isResolved()).toBeTruthy();
+      expect(result).not.to.be.undefined;
+      expect(result.isResolved()).to.be.ok;
     });
 
   });
@@ -66,7 +66,7 @@ describe('ResourceCollection', function() {
 
     it('should be present in the identity map', function() {
       var id = instance.get('id');
-      expect(Em.ResourceCollection.identityMap.get(id)).toBeTruthy();
+      expect(Em.ResourceCollection.identityMap.get(id)).to.be.ok;
     });
 
     describe('when destroyed', function() {
@@ -76,7 +76,7 @@ describe('ResourceCollection', function() {
 
       it('should remove it from the identity map', function() {
         var id = instance.get('id');
-        expect(Em.ResourceCollection.identityMap.get(id)).toBeFalsy();
+        expect(Em.ResourceCollection.identityMap.get(id)).to.not.be.ok;
       });
     });
 

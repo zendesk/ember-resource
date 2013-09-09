@@ -23,12 +23,12 @@ describe('Destroying a resource instance', function() {
 
     beforeEach(function() {
       model = Model.create({id: 1});
-      expect(Model.identityMap.get(1)).toEqual(model);
+      expect(Model.identityMap.get(1)).to.equal(model);
       model.destroy();
     });
 
     it('should remove the object from the identity map', function() {
-      expect(Model.identityMap.get(1)).toBe(undefined);
+      expect(Model.identityMap.get(1)).to.be.undefined;
     });
   });
 
@@ -40,7 +40,7 @@ describe('Destroying a resource instance', function() {
     });
 
     it('should not throw an exception', function() {
-      expect(model.destroy.bind(model)).not.toThrow();
+      expect(model.destroy.bind(model)).to.not.throw(Error);
     });
   });
 
@@ -50,7 +50,7 @@ describe('Destroying a resource instance', function() {
     });
 
     it('should pass a reference to the resource to the error handling function', function() {
-      var spy = jasmine.createSpy();
+      var spy = sinon.spy();
 
       Ember.Resource.errorHandler = function(a, b, c, fourthArgument) {
         spy(fourthArgument.resource, fourthArgument.operation);
@@ -60,7 +60,7 @@ describe('Destroying a resource instance', function() {
       resource.destroyResource();
       server.respond();
 
-      expect(spy).toHaveBeenCalledWith(resource, "destroy");
+      expect(spy.calledWith(resource, "destroy")).to.be.ok;
     });
   });
 });

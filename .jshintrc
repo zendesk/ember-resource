@@ -1,7 +1,7 @@
 {
   "predef":   [
-                "$", "SC", "_", "describe", "it", "expect", "beforeEach",
-                "afterEach", "spyOn", "runs", "waits", "waitsFor", "sinon"
+                "$", "Ember", "Em", "_",
+                "describe", "beforeEach", "afterEach", "it", "expect", "sinon"
               ],
 
   "bitwise":  true,

@@ -26,7 +26,7 @@ describe('Saving a resource instance', function() {
     });
 
     it('should pass a reference to the resource to the error handling function', function() {
-      var spy = jasmine.createSpy();
+      var spy = sinon.spy();
       Ember.Resource.errorHandler = function(a, b, c, fourthArgument) {
         spy(fourthArgument.resource, fourthArgument.operation);
       };
@@ -35,7 +35,7 @@ describe('Saving a resource instance', function() {
       resource.save();
       server.respond();
 
-      expect(spy).toHaveBeenCalledWith(resource, "create");
+      expect(spy.calledWith(resource, "create")).to.be.ok;
     });
   });
 
@@ -45,7 +45,7 @@ describe('Saving a resource instance', function() {
     });
 
     it('should pass a reference to the resource to the error handling function', function() {
-      var spy = jasmine.createSpy();
+      var spy = sinon.spy();
       Ember.Resource.errorHandler = function(a, b, c, fourthArgument) {
         spy(fourthArgument.resource, fourthArgument.operation);
       };
@@ -57,7 +57,7 @@ describe('Saving a resource instance', function() {
       resource.save();
       server.respond();
 
-      expect(spy).toHaveBeenCalledWith(resource, "update");
+      expect(spy.calledWith(resource, "update")).to.be.ok;
     });
   });
 
@@ -68,33 +68,33 @@ describe('Saving a resource instance', function() {
       beforeEach(function() {
         server.respondWith('POST', '/people', [201, {}, '']);
         resource = Model.create({ name: 'foo' });
-        expect(resource.get('resourceState')).not.toBe(Ember.Resource.Lifecycle.SAVING);
+        expect(resource.get('resourceState')).not.to.equal(Ember.Resource.Lifecycle.SAVING);
       });
 
       it('should change to the saving state while saving', function() {
-        expect(resource.save()).toBeTruthy();
-        expect(resource.get('resourceState')).toBe(Ember.Resource.Lifecycle.SAVING);
+        expect(resource.save()).to.be.ok;
+        expect(resource.get('resourceState')).to.equal(Ember.Resource.Lifecycle.SAVING);
       });
 
       it('should indicate that it is saving', function() {
-        expect(resource.get('isSaving')).toBe(false);
-        expect(resource.save()).toBeTruthy();
-        expect(resource.get('isSaving')).toBe(true);
+        expect(resource.get('isSaving')).to.equal(false);
+        expect(resource.save()).to.be.ok;
+        expect(resource.get('isSaving')).to.equal(true);
       });
 
       it('should change to previous state after save completes', function() {
         var previousState = resource.get('resourceState');
-        expect(resource.save()).toBeTruthy();
-        expect(resource.get('resourceState')).not.toBe(previousState);
+        expect(resource.save()).to.be.ok;
+        expect(resource.get('resourceState')).not.to.equal(previousState);
         server.respond();
-        expect(resource.get('resourceState')).toBe(previousState);
+        expect(resource.get('resourceState')).to.equal(previousState);
       });
 
       it('should not allow concurrent saves', function() {
-        expect(resource.save()).toBeTruthy();
-        expect(resource.save()).toBe(false);
+        expect(resource.save()).to.be.ok;
+        expect(resource.save()).to.equal(false);
         server.respond();
-        expect(resource.save()).toBeTruthy();
+        expect(resource.save()).to.be.ok;
       });
     });
 
@@ -112,7 +112,7 @@ describe('Saving a resource instance', function() {
       it('should update with the id from the Location header', function() {
         resource.save();
         server.respond();
-        expect(resource.get('id')).toBe(25);
+        expect(resource.get('id')).to.equal(25);
       });
     });
 
@@ -131,7 +131,7 @@ describe('Saving a resource instance', function() {
       it('should update with the id from the custom parser', function() {
         resource.save();
         server.respond();
-        expect(resource.get('id')).toBe(100);
+        expect(resource.get('id')).to.equal(100);
       });
     });
 
@@ -144,18 +144,18 @@ describe('Saving a resource instance', function() {
       it('should update with the data given', function() {
         resource.save();
         server.respond();
-        expect(resource.get('id')).toBe(1);
-        expect(resource.get('subject')).toBe('the subject');
-        expect(resource.get('name')).toBe('foo');
+        expect(resource.get('id')).to.equal(1);
+        expect(resource.get('subject')).to.equal('the subject');
+        expect(resource.get('name')).to.equal('foo');
       });
 
       it('should not update with the data if you pass the update: false option', function() {
         resource.save({update: false});
         server.respond();
-        expect(resource.get('id')).toBeUndefined();
-        expect(resource.get('subject')).toBeUndefined();
-        expect(resource.get('name')).toBe('foo');
-      })
+        expect(resource.get('id')).to.be.undefined;
+        expect(resource.get('subject')).to.be.undefined;
+        expect(resource.get('name')).to.equal('foo');
+      });
 
       describe('resource has one embedded association', function() {
         beforeEach(function() {
@@ -181,8 +181,8 @@ describe('Saving a resource instance', function() {
         it("should update with the data given", function() {
           resource.save();
           server.respond();
-          expect(resource.get('id')).toBe(1);
-          expect(getPath(resource, 'address.street')).toBe('baz');
+          expect(resource.get('id')).to.equal(1);
+          expect(getPath(resource, 'address.street')).to.equal('baz');
         });
       });
     });

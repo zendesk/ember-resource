@@ -25,7 +25,7 @@ describe('deferred fetch', function() {
 
   describe("fetched() for resources", function() {
     it("should resolve with the resource when the fetch completes", function() {
-      var handler = jasmine.createSpy('onFetch');
+      var handler = sinon.spy();
 
       var person = Person.create({id: 1});
       person.fetched().done(handler);
@@ -33,32 +33,35 @@ describe('deferred fetch', function() {
       person.fetch();
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
+      // expect(handler.callCount).to.equal(1);
+      // expect(handler.getCall(0).args[0]).to.deep.equal(PERSON_DATA);
+      // expect(handler.getCall(0).args[1]).to.be(person);
+      expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
     });
   });
 
   describe('fetch() for unfetched resources', function() {
     it('resolves with the resource when the server responds', function() {
-      var handler = jasmine.createSpy('onFetch'),
+      var handler = sinon.spy(),
           person = Person.create({id: 1});
 
       person.fetch().done(handler);
       server.respond();
 
-      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
+      expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
     });
   });
 
   describe('fetch() for fetched, non-expired resources', function() {
     it('should resolve with the resource immediately', function() {
-      var handler = jasmine.createSpy('onFetch'),
+      var handler = sinon.spy(),
           person = Person.create({id: 1});
 
       person.fetch();
       server.respond();
 
       person.fetch().done(handler);
-      expect(handler).toHaveBeenCalledWith(PERSON_DATA, person);
+      expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
     });
   });
 
@@ -73,14 +76,14 @@ describe('deferred fetch', function() {
       resource.fetch();
       server.respond();
 
-      spyOn(resource, 'willFetch').andReturn($.when());
+      sinon.stub(resource, 'willFetch').returns($.when());
       resource.fetch();
       server.respond();
-      expect(resource.willFetch).toHaveBeenCalled();
+      expect(resource.willFetch.callCount).to.equal(1);
     });
 
     it('should pass a reference to the resource to the error handling function', function() {
-      var spy = jasmine.createSpy();
+      var spy = sinon.spy();
       Ember.Resource.errorHandler = function(a, b, c, fourthArgument) {
         spy(fourthArgument.resource, fourthArgument.operation);
       };
@@ -90,7 +93,7 @@ describe('deferred fetch', function() {
       resource.fetch();
       server.respond();
 
-      expect(spy).toHaveBeenCalledWith(resource, "read");
+      expect(spy.calledWith(resource, "read")).to.be.ok;
     });
   });
 
@@ -101,7 +104,7 @@ describe('deferred fetch', function() {
     });
 
     it('should pass a reference to the resource to the error handling function', function() {
-      var spy = jasmine.createSpy();
+      var spy = sinon.spy();
       Ember.Resource.errorHandler = function(a, b, c, fourthArgument) {
         spy(fourthArgument.resource, fourthArgument.operation);
       };
@@ -109,7 +112,7 @@ describe('deferred fetch', function() {
       people.fetch();
       server.respond();
 
-      expect(spy).toHaveBeenCalledWith(people, "read");
+      expect(spy.calledWith(people, "read")).to.be.ok;
     });
   });
 
@@ -122,28 +125,20 @@ describe('deferred fetch', function() {
 
     });
 
-    afterEach(function() {
-      window.stopHere = false;
-    });
+    it("should resolve with the collection when the fetch completes", function(done) {
+      var handler = sinon.spy();
 
-    it("should resolve with the collection when the fetch completes", function() {
+      people.expire();
 
-      var handler = jasmine.createSpy('onFetch');
+      people.fetched().done(handler);
 
-      runs(function() {
-        people.expire();
+      people.fetch();
+      server.respond();
 
-        people.fetched().done(handler);
-
-        people.fetch();
-        server.respond();
-      });
-
-      waits(1000);
-
-      runs(function() {
-        expect(handler).toHaveBeenCalledWith([PERSON_DATA], people);
-      });
+      setTimeout(function() {
+        expect(handler.calledWith([PERSON_DATA], people)).to.be.ok;
+        done();
+      }, 1000);
     });
   });
 
