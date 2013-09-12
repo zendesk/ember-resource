@@ -758,7 +758,7 @@
       return this._fetchDfd;
     },
 
-    fetch: function(ajaxOptions) {
+    fetch: function(ajaxOptions, fetcher) {
       var sideloads;
       if (!Ember.get(this, 'isFetchable')) return $.when(this.get('data'), this);
 
@@ -787,7 +787,9 @@
 
       var result = this.deferedFetch = $.Deferred();
 
-      Ember.Resource.ajax(ajaxOptions)
+      fetcher = fetcher || Ember.Resource;
+
+      fetcher.ajax(ajaxOptions)
         .done(function(json) {
           self.updateWithApiData(json);
           self.didFetch.call(self);
@@ -1137,7 +1139,7 @@
       return this._fetchDfd;
     },
 
-    fetch: function(ajaxOptions) {
+    fetch: function(ajaxOptions, fetcher) {
       if (!Ember.get(this, 'isFetchable') || Ember.get(this, 'prePopulated')) return $.when(this);
 
       var self = this;
@@ -1148,7 +1150,7 @@
 
       var result = this.deferedFetch = $.Deferred();
 
-      this._fetch(ajaxOptions)
+      this._fetch(ajaxOptions, fetcher)
         .done(function(json) {
           set(self, 'content', self.parse(json));
           self.fetched().resolve(json, self);
@@ -1174,14 +1176,17 @@
       }
     },
 
-    _fetch: function(ajaxOptions) {
+    _fetch: function(ajaxOptions, fetcher) {
       this._resolveType();
       ajaxOptions = $.extend({}, ajaxOptions, {
         url: this.resolveUrl(),
         resource: this,
         operation: 'read'
       });
-      return Ember.Resource.ajax(ajaxOptions);
+
+      fetcher = fetcher || Ember.Resource;
+
+      return fetcher.ajax(ajaxOptions);
     },
 
     resolveUrl: function() {

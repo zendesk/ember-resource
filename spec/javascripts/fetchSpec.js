@@ -142,4 +142,35 @@ describe('deferred fetch', function() {
     });
   });
 
+  describe("custom fetchers", function() {
+    describe("on resources", function() {
+      var person;
+      beforeEach(function() {
+        person = Person.create({id: 1});
+      });
+
+      it("should use the fetcher instead to make ajax calls", function(){
+        var fetcher = {ajax: sinon.spy(function() { return $.when();})};
+        person.fetch({}, fetcher);
+        expect(fetcher.ajax.called);
+      });
+    });
+
+    describe("on collections", function() {
+      var person;
+      beforeEach(function() {
+        person = Person.create({id: 1});
+      });
+
+      it("should use the fetcher instead to make ajax calls", function(){
+        people = Ember.ResourceCollection.create({type: Person});
+        var fetcher = {ajax: sinon.spy(function() { return $.when([]);})};
+        people.fetch({}, fetcher);
+        expect(fetcher.ajax.called);
+      });
+
+
+    });
+  });
+
 });
