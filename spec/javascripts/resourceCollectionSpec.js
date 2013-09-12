@@ -30,7 +30,7 @@ describe('ResourceCollection', function() {
         type: Model,
         content: [ { name: 'instance' } ]
       });
-      expect(collection.objectAt(0).get('name')).toBe('Model instance');
+      expect(collection.objectAt(0).get('name')).to.equal('Model instance');
     });
   });
 
