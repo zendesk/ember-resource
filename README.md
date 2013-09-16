@@ -176,25 +176,9 @@ different signature. Those deferreds resolve with the resource and a String
 describing the action that occurred (one of
 `[ "create", "update", "destroy" ]`).
 
-## Testing
+## Development
 
-Currently the command line test runners are in a state of disrepair :( To run
-the Ember Resource test suite, just open `spec/runner.html` in your favorite
-browser.
-
-On Mac OS:
-
-    open spec/runner.html
-
-## Building a distribution
-
-There is a rake task to generate an asset for distribution.
-
-```
-  rake dist:build
-```
-
-The output will be put in the `dist/` folder.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ## Copyright and license
 
