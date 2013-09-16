@@ -15,10 +15,6 @@
     return obj === Object(obj);
   }
 
-  function isEmpty(obj) {
-    return $.isEmptyObject(obj);
-  }
-
   // Used when evaluating schemas to turn a type String into a class.
   Ember.Resource.lookUpType = function(string) {
     return getPath(string);
@@ -72,7 +68,11 @@
     getValue: Ember.required(Function),
     setValue: Ember.required(Function),
 
-    dependencies: ['_new_data'],
+    dependencies: Ember.computed('path', function() {
+      var deps = ['data.' + this.get('path')];
+
+      return deps;
+    }).cacheable(),
 
     data: function(instance) {
       return Ember.get(instance, 'data');
@@ -740,8 +740,6 @@
         Ember.beginPropertyChanges(data);
         Ember.Resource.deepMerge(data, this.constructor.parse(json));
         Ember.endPropertyChanges(data);
-
-        Ember.propertyDidChange(this, '_new_data');
       }
     },
 
@@ -981,12 +979,7 @@
             instance = this._super.call(this, { data: data });
             this.identityMap.put(id, instance);
           } else {
-            var keys = Em.keys(data);
-            // Data.id is used by HasOneRemoteSchemaItem to request resource from identity map (no data is present),
-            // in this case avoid calling updateWithApiData (which fires didChange for all the resource properties)
-            if (!isEmpty(data) && Em.compare(keys, ['id']) !== 0) {
-              instance.updateWithApiData(data);
-            }
+            instance.updateWithApiData(data);
             // ignore incoming resourceState and id arguments
             delete options.resourceState;
             delete options.id;

@@ -119,16 +119,6 @@ describe('identity map', function() {
         expect(spy.callCount).to.equal(1);
       });
     });
-
-    describe('Updating that instance with empty API data', function() {
-      beforeEach(function() {
-        Address.create({ id: 1 }, {});
-      });
-
-      it('should not call updateWithApiData', function() {
-        expect(spy.callCount).to.equal(0);
-      });
-    });
   });
 
 });
