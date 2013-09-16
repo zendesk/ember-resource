@@ -178,21 +178,28 @@ describing the action that occurred (one of
 
 ## Testing
 
-Currently the command line test runners are in a state of disrepair :( To run
-the Ember Resource test suite, just open `spec/runner.html` in your favorite
-browser.
+Tests can be run from the command line, or in a browser:
+
+### Browser
+
+To run the Ember Resource test suite in a browser, just open `spec/runner.html`
+in your favorite browser.
 
 On Mac OS:
 
     open spec/runner.html
 
+### Command line
+
+To run the test suite from the command line run the `make test` command:
+
+    make test
+
 ## Building a distribution
 
-There is a rake task to generate an asset for distribution.
+To build your very own copy of Ember Resource run the `make dist` task:
 
-```
-  rake dist:build
-```
+    make dist
 
 The output will be put in the `dist/` folder.
 
