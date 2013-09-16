@@ -768,7 +768,7 @@
 
       var self = this;
 
-      if (this.deferedFetch && !Ember.get(this, 'isExpired')) return this.deferedFetch;
+      if (this.deferredFetch && !Ember.get(this, 'isExpired')) return this.deferredFetch;
 
       self.willFetch.call(self);
       Ember.sendEvent(self, 'willFetch');
@@ -785,7 +785,7 @@
         ajaxOptions.data = {include: sideloads.join(",")};
       }
 
-      var result = this.deferedFetch = $.Deferred();
+      var result = this.deferredFetch = $.Deferred();
 
       Ember.Resource.ajax(ajaxOptions)
         .done(function(json) {
@@ -803,7 +803,7 @@
           result.reject.apply(result, arguments);
         }).
         always(function() {
-          self.deferedFetch = null;
+          self.deferredFetch = null;
         });
 
       return result.promise();
@@ -1142,11 +1142,11 @@
 
       var self = this;
 
-      if (this.deferedFetch && !Ember.get(this, 'isExpired')) return this.deferedFetch;
+      if (this.deferredFetch && !Ember.get(this, 'isExpired')) return this.deferredFetch;
 
       Ember.sendEvent(self, 'willFetch');
 
-      var result = this.deferedFetch = $.Deferred();
+      var result = this.deferredFetch = $.Deferred();
 
       this._fetch(ajaxOptions)
         .done(function(json) {
