@@ -544,39 +544,6 @@
   });
 
 
-  // Gives custom error handlers access to the resource object.
-  // 1. `this` will refer to the Ember.Resource object.
-  // 2. `resource` will be passed as the last argument
-  //
-  //     function errorHandler() {
-  //       this; // the Ember.Resource
-  //     }
-  //
-  //     function errorHandler(jqXHR, textStatus, errorThrown, resource) {
-  //       resource; // another way to reference the resource object
-  //     }
-  //
-  var errorHandlerWithContext = function(errorHandler, context) {
-    return function() {
-      var args = Array.prototype.slice.call(arguments, 0);
-      args.push(context);
-      errorHandler.apply(context, args);
-    };
-  };
-
-  Ember.Resource.ajax = function(options) {
-    options.dataType = options.dataType || 'json';
-    options.type     = options.type     || 'GET';
-
-    if (options.error) {
-      options.error = errorHandlerWithContext(options.error, options);
-    } else if (Ember.Resource.errorHandler) {
-      options.error = errorHandlerWithContext(Ember.Resource.errorHandler, options);
-    }
-
-    return $.ajax(options);
-  };
-
   Ember.Resource.Lifecycle = {
     INITIALIZING: 0,
     UNFETCHED:    10,
@@ -785,7 +752,7 @@
 
       var result = this.deferredFetch = $.Deferred();
 
-      Ember.Resource.ajax(ajaxOptions)
+      Ember.Resource.fetch(this, ajaxOptions)
         .done(function(json) {
           self.updateWithApiData(json);
           self.didFetch.call(self);
@@ -1174,7 +1141,7 @@
         resource: this,
         operation: 'read'
       });
-      return Ember.Resource.ajax(ajaxOptions);
+      return Ember.Resource.fetch(this, ajaxOptions);
     },
 
     resolveUrl: function() {

@@ -8,7 +8,7 @@ ci: dist test
 
 $(DIST_JS): jshint
 	mkdir -p dist
-	cat src/vendor/lru.js src/base.js src/remote_expiry.js src/identity_map.js src/ember-resource.js > $@
+	cat src/vendor/lru.js src/base.js src/remote_expiry.js src/identity_map.js src/fetch.js src/ember-resource.js > $@
 
 jshint: npm_install
 	$(JSHINT) src/*.js src/vendor/*.js spec/javascripts/*Spec.js
