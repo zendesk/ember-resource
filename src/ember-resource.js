@@ -1103,6 +1103,23 @@
       if (match) {
         return match[1];
       }
+    },
+
+    // accepts a single id or an array of ids
+    findAndExpire: function(ids) {
+      var cache = this.identityMap && this.identityMap.cache;
+      var cacheRecord;
+
+      if (ids == null || !cache) return;
+
+      ids = Em.isArray(ids) ? ids : [ids];
+
+      for (var i=0; i<ids.length; i++) {
+        cacheRecord = cache.find(ids[i]);
+        if (cacheRecord && cacheRecord.value) {
+          cacheRecord.value.expireNow();
+        }
+      }
     }
   }, Ember.Resource.Lifecycle.classMixin);
 
