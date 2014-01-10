@@ -1110,10 +1110,10 @@
       var cache = this.identityMap && this.identityMap.cache;
       var cacheRecord;
 
-      if (!cache) return;
-      if (ids !== null && !Em.isArray(ids)) {
-        ids = [ids];
-      }
+      if (ids == null || !cache) return;
+
+      ids = Em.isArray(ids) ? ids : [ids];
+
       for (var i=0; i<ids.length; i++) {
         cacheRecord = cache.find(ids[i]);
         if (cacheRecord && cacheRecord.value) {

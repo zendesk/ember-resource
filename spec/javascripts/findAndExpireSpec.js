@@ -16,7 +16,8 @@ describe('findAndExpire', function() {
     Class.findAndExpire([1, 2, 3, 4]);
 
     expect(instance1.get('isExpired')).to.equal(true);
-    expect(instance2.get('isExpired')).to.equal(true);    
+    expect(instance2.get('isExpired')).to.equal(true);
+    expect(Class.identityMap.cache.keys().join()).to.equal("1,2");
   });
 
   it('finds and expires an instance by id', function() {
