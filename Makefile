@@ -16,6 +16,9 @@ jshint: npm_install
 test: jshint npm_install
 	./node_modules/mocha-phantomjs/bin/mocha-phantomjs spec/runner.html
 
+test-ember-1: jshint npm_install
+	./node_modules/mocha-phantomjs/bin/mocha-phantomjs spec/runner-1.0.html
+
 npm_install:
 	npm install
 
