@@ -633,7 +633,7 @@
         });
       },
 
-      isFetchable: Ember.computed('resourceState', 'isExpired', function() {
+      isFetchable: Ember.computed(function() {
         var state = getPath(this, 'resourceState');
         return state == Ember.Resource.Lifecycle.UNFETCHED || this.get('isExpired');
       }).volatile(),
@@ -666,10 +666,20 @@
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
       }).cacheable(),
 
+      // Notify dependents on volatile properties
+      resourceStateDidChange: function() {
+        this.notifyPropertyChange('isFetchable');
+      }.observes('resourceState'),
+
+      expireAtDidChange: function() {
+        this.notifyPropertyChange('isExpired');
+        this.notifyPropertyChange('isFetchable');
+      }.observes('expireAt'),
+
       expire: function () {
         Ember.run.next(this, function () {
           if(getPath(this, 'isDestroyed')) { return; }
-          set(this, 'expireAt', new Date());
+          this.expireNow();
         });
       },
 
@@ -682,7 +692,7 @@
         return this.fetch();
       },
 
-      isExpired: Ember.computed('expireAt', function(name, value) {
+      isExpired: Ember.computed(function(name, value) {
         var expireAt = this.get('expireAt');
         var now = new Date();
 
@@ -748,7 +758,7 @@
       if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
 
       self.willFetch.call(self);
-      Ember.sendEvent(self, 'willFetch');
+      Ember.Resource.sendEvent(self, 'willFetch');
 
       ajaxOptions = $.extend({}, ajaxOptions, {
         url: url,
@@ -768,13 +778,13 @@
         .done(function(json) {
           self.updateWithApiData(json);
           self.didFetch.call(self);
-          Ember.sendEvent(self, 'didFetch');
+          Ember.Resource.sendEvent(self, 'didFetch');
           self.fetched().resolve(json, self);
           result.resolve(json, self);
         })
         .fail(function() {
           self.didFail.call(self);
-          Ember.sendEvent(self, 'didFail');
+          Ember.Resource.sendEvent(self, 'didFail');
           var fetched = self.fetched();
           fetched.reject.apply(fetched, arguments);
           result.reject.apply(result, arguments);
@@ -840,7 +850,7 @@
       var self = this;
 
       self.willSave.call(self);
-      Ember.sendEvent(self, 'willSave');
+      Ember.Resource.sendEvent(self, 'willSave');
 
       var deferedSave = Ember.Resource.ajax(ajaxOptions);
 
@@ -858,11 +868,11 @@
         }
 
         self.didSave.call(self, {created: isCreate});
-        Ember.sendEvent(self, 'didSave', {created: isCreate});
+        Ember.Resource.sendEvent(self, 'didSave', [{created: isCreate}]);
 
       }).fail(function() {
         self.didFail.call(self);
-        Ember.sendEvent(self, 'didFail');
+        Ember.Resource.sendEvent(self, 'didFail');
       });
 
       return deferedSave;
@@ -871,6 +881,7 @@
     destroyResource: function() {
       var previousState = getPath(this, 'resourceState'), self = this;
       set(this, 'resourceState', Ember.Resource.Lifecycle.DESTROYING);
+
       return Ember.Resource.ajax({
         type: 'DELETE',
         operation: 'destroy',
@@ -1141,7 +1152,7 @@
 
       if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
 
-      Ember.sendEvent(self, 'willFetch');
+      Ember.Resource.sendEvent(self, 'willFetch');
 
       var result = this.deferredFetch = $.Deferred(), parsedData;
 
@@ -1160,7 +1171,7 @@
           fetched.reject.apply(fetched, arguments);
         })
         .always(function() {
-          Ember.sendEvent(self, 'didFetch');
+          Ember.Resource.sendEvent(self, 'didFetch');
           self.deferredFetch = null;
         });
 

@@ -113,23 +113,23 @@ describe('Lifecycle', function() {
       });
 
       it('should expire the object', function(done) {
-        Ember.addObserver(person, 'isExpired', function() {
-          if (person.get('isExpired')) { done(); }
+        Em.run.next(function() {
+          expect(person.get('isExpired')).to.be.ok;
+          done();
         });
       });
 
       it('should result in the object becoming fetchable', function(done) {
-        Ember.addObserver(person, 'isFetchable', function() {
-          if (person.get('isFetchable')) { done(); }
+        Em.run.next(function() {
+          expect(person.get('isFetchable')).to.be.ok;
+          done();
         });
       });
 
       it('should not tick the ember resource clock', function(done) {
-        Ember.addObserver(person, 'isFetchable', function() {
-          if (person.get('isExpired') && person.get('isFetchable')) {
-            expect(tickSpy.callCount).to.equal(0);
-            done();
-          }
+        Em.run.next(function() {
+          expect(tickSpy.callCount).to.equal(0);
+          done();
         });
       });
     });
@@ -157,7 +157,7 @@ describe('Lifecycle', function() {
 
       obj = Ember.Object.extend({
         person: person,
-        isFetchedDidChange: function() {
+        isFetchableDidChange: function() {
           called = true;
         }.observes('person.isFetchable')
       }).create();
