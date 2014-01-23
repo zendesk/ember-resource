@@ -14,4 +14,22 @@
     return getSupportsPath ? Ember.get : Ember.getPath;
   }());
 
+  window.Ember.Resource.sendEvent = (function() {
+    if (Ember.sendEvent.length === 2) {
+      // If Ember 0.9, make an Ember 1.0-style function out of the
+      // Ember 0.9 one:
+      return function sendEvent(obj, eventName, params, actions) {
+        Ember.warn("Ember.Resources.sendEvent can't do anything with actions on Ember 0.9", !actions);
+        params = params || [];
+        params.unshift(eventName);
+        params.unshift(obj);
+        return Ember.sendEvent.apply(Ember, params);
+      };
+    }
+
+    return function sendEvent(obj, eventName, params, actions) {
+      return Ember.sendEvent(obj, eventName, params, actions);
+    };
+  }());
+
 }());

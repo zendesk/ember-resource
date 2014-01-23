@@ -13,8 +13,13 @@ $(DIST_JS): jshint
 jshint: npm_install
 	$(JSHINT) src/*.js src/vendor/*.js spec/javascripts/*Spec.js
 
-test: jshint npm_install
+test: test-ember-09 test-ember-1
+
+test-ember-09: jshint npm_install
 	./node_modules/mocha-phantomjs/bin/mocha-phantomjs spec/runner.html
+
+test-ember-1: jshint npm_install
+	./node_modules/mocha-phantomjs/bin/mocha-phantomjs spec/runner-1.0.html
 
 npm_install:
 	npm install

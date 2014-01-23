@@ -66,7 +66,7 @@ describe('Saving a resource instance', function() {
       var resource;
 
       beforeEach(function() {
-        server.respondWith('POST', '/people', [201, {}, '']);
+        server.respondWith('POST', '/people', [201, {}, '{}']);
         resource = Model.create({ name: 'foo' });
         expect(resource.get('resourceState')).not.to.equal(Ember.Resource.Lifecycle.SAVING);
       });
@@ -107,7 +107,7 @@ describe('Saving a resource instance', function() {
       beforeEach(function() {
         resource = Model.create({ name: 'foo' });
         sinon.spy(resource, 'didSave');
-        server.respondWith('POST', '/people', [201, {}, '']);
+        server.respondWith('POST', '/people', [201, {}, '{}']);
         resource.save();
         server.respond();
       });
@@ -121,7 +121,7 @@ describe('Saving a resource instance', function() {
       beforeEach(function() {
         resource = Model.create({ name: 'foo' });
         sinon.spy(resource, 'didSave');
-        server.respondWith('POST', '/people', [500, {}, '']);
+        server.respondWith('POST', '/people', [500, {}, '{}']);
         resource.save();
         server.respond();
       });
@@ -133,7 +133,7 @@ describe('Saving a resource instance', function() {
 
     describe('when saving a new record', function() {
       beforeEach(function() {
-        server.respondWith('POST', '/people', [201, {}, '']);
+        server.respondWith('POST', '/people', [201, {}, '{}']);
         resource = Model.create({ name: 'foo' });
         sinon.spy(resource, 'didSave');
         resource.save();
@@ -147,7 +147,7 @@ describe('Saving a resource instance', function() {
 
     describe('when saving an existing record', function() {
       beforeEach(function() {
-        server.respondWith('PUT', '/people/1', [200, {}, '']);
+        server.respondWith('PUT', '/people/1', [200, {}, '{}']);
         resource = Model.create({ id: 1, name: 'foo' });
         sinon.spy(resource, 'didSave');
         resource.save();
@@ -167,7 +167,7 @@ describe('Saving a resource instance', function() {
 
     describe('with default Location header parsing', function() {
       beforeEach(function() {
-        server.respondWith('POST', '/people', [201, {'Location': 'http://example.com/people/25.json'}, '']);
+        server.respondWith('POST', '/people', [201, {'Location': 'http://example.com/people/25.json'}, '{}']);
         resource = Model.create({ name: 'foo' });
       });
 
@@ -180,7 +180,7 @@ describe('Saving a resource instance', function() {
 
     describe('with a custom Location header parser', function() {
       beforeEach(function() {
-        server.respondWith('POST', '/people', [201, {'Location': 'http://example.com/people/25.json'}, '']);
+        server.respondWith('POST', '/people', [201, {'Location': 'http://example.com/people/25.json'}, '{}']);
         Model.reopenClass({
           idFromURL: function(url) {
             return 100;

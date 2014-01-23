@@ -50,7 +50,7 @@ describe('ResourceCollection', function() {
     it('returns a resolved deferred for #fetch', function() {
       var result = this.collection.fetch();
       expect(result).not.to.be.undefined;
-      expect(result.isResolved()).to.be.ok;
+      expect(result.state()).to.equal('resolved');
     });
 
   });
