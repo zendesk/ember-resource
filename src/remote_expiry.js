@@ -9,21 +9,13 @@
 
   var RemoteExpiry = Ember.Mixin.create({
     init: function() {
-      var ret = this._super(),
-          self = this,
-          remoteExpiryScope = this.get('remoteExpiryKey');
+      this._super();
+      this._subscribedForExpiry = false;
 
-      this.set('_subscribedForExpiry', false);
-
-      if (!remoteExpiryScope) {
-        return ret;
+      if (this.get('remoteExpiryKey')) {
+        Ember.addListener(this, 'didFetch', this,
+          this.subscribeForExpiry.bind(this));
       }
-
-      Ember.addListener(this, 'didFetch', this, function() {
-        self.subscribeForExpiry();
-      });
-
-      return ret;
     },
 
     subscribeForExpiry: function() {
@@ -34,7 +26,7 @@
         return;
       }
 
-      if (this.get('_subscribedForExpiry')) {
+      if (this._subscribedForExpiry) {
         return;
       }
 
@@ -42,7 +34,7 @@
         self.updateExpiry(message);
       });
 
-      this.set('_subscribedForExpiry', true);
+      this._subscribedForExpiry = true;
     },
 
     updateExpiry: function(message) {
