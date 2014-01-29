@@ -9,12 +9,15 @@
 
   var RemoteExpiry = Ember.Mixin.create({
     init: function() {
+      var self = this;
+
       this._super();
       this._subscribedForExpiry = false;
 
       if (this.get('remoteExpiryKey')) {
-        Ember.addListener(this, 'didFetch', this,
-          this.subscribeForExpiry.bind(this));
+        Ember.addListener(this, 'didFetch', this, function() {
+          self.subscribeForExpiry();
+        });
       }
     },
 
