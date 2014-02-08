@@ -12,7 +12,7 @@
       var self = this;
 
       this._super();
-      this._subscribedForExpiry = false;
+      this._expiryCallback = null;
 
       if (this.get('remoteExpiryKey')) {
         Ember.addListener(this, 'didFetch', this, function() {
@@ -22,22 +22,35 @@
     },
 
     subscribeForExpiry: function() {
-      var remoteExpiryScope = this.get('remoteExpiryKey'),
-          self = this;
+      var remoteExpiryScope = this.get('remoteExpiryKey');
 
       if (!remoteExpiryScope) {
         return;
       }
 
-      if (this._subscribedForExpiry) {
+      if (this._expiryCallback) {
         return;
       }
 
-      Ember.Resource.PushTransport.subscribe(remoteExpiryScope, function(message) {
-        self.updateExpiry(message);
-      });
+      this._expiryCallback = this.updateExpiry.bind(this);
 
-      this._subscribedForExpiry = true;
+      Ember.Resource.PushTransport.subscribe(remoteExpiryScope, this._expiryCallback);
+
+    },
+
+    willDestroy: function() {
+      var remoteExpiryScope = this.get('remoteExpiryKey');
+
+      if (!remoteExpiryScope) {
+        return;
+      }
+
+      if (!this._expiryCallback) {
+        return;
+      }
+
+      Ember.Resource.PushTransport.unsubscribe(remoteExpiryScope, this._expiryCallback);
+      this._super && this._super();
     },
 
     updateExpiry: function(message) {
