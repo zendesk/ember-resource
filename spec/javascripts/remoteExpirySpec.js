@@ -131,4 +131,27 @@ describe('remote expiry', function() {
       });
     });
   });
+
+  describe('unsubscribing on destroy', function() {
+    beforeEach(function() {
+      Resource = Ember.Resource.define().extend({
+        remoteExpiryKey: "foo"
+      });
+      this.resource = Resource.create();
+      sinon.spy(Em.Resource.PushTransport, 'subscribe');
+
+      this.spy = sinon.stub(Ember.Resource.PushTransport, 'unsubscribe');
+      Ember.sendEvent(this.resource, 'didFetch');
+      Ember.run.sync();
+
+    });
+
+    it('should unsubscribe when destroyed', function() {
+      Em.run(this, function() {
+        this.resource.destroy();
+      });
+      expect(this.spy.callCount).to.equal(1);
+    });
+
+  });
 });
