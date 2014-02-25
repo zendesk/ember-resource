@@ -96,6 +96,12 @@ describe('Saving a resource instance', function() {
         server.respond();
         expect(resource.save()).to.be.ok;
       });
+
+      it("should not allow setting the value of isSaving", function() {
+        expect(resource.get('isSaving')).to.equal(false);
+        resource.set('isSaving', 'custom_value');
+        expect(resource.get('isSaving')).not.to.equal('custom_value');
+      });
     });
 
   });
