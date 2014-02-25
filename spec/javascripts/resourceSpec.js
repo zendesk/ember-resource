@@ -255,6 +255,26 @@ describe('A Resource instance', function () {
         expect(model.get("name")).to.be.undefined;
       });
     });
-
   });
+
+  describe("resource states", function() {
+    beforeEach(function() {
+      model = Model.create();
+    });
+
+    it("should be readonly", function() {
+      [
+        'isSaving',
+        'isSavable',
+        'isFetched',
+        'isFetching',
+        'isInitializing',
+        'isFetchable'
+      ].forEach(function(state) {
+        model.set(state, 'custom_value');
+        expect(model.get(state)).not.to.equal('custom_value', 'fail message');
+      });
+    });
+  });
+
 });
