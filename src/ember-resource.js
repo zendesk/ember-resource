@@ -747,6 +747,9 @@
 
     fetch: function(ajaxOptions) {
       var sideloads;
+
+      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
+
       if (!getPath(this, 'isFetchable')) return $.when(this.get('data'), this);
 
       var url = this.resourceURL();
@@ -754,8 +757,6 @@
       if (!url) return;
 
       var self = this;
-
-      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
 
       self.willFetch.call(self);
       Ember.Resource.sendEvent(self, 'willFetch');
