@@ -748,7 +748,9 @@
     fetch: function(ajaxOptions) {
       var sideloads;
 
-      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
+      if (this.deferredFetch && !getPath(this, 'isExpired')) {
+        return this.deferredFetch.promise();
+      }
 
       if (!getPath(this, 'isFetchable')) return $.when(this.get('data'), this);
 

@@ -55,12 +55,15 @@ describe('deferred fetch', function() {
   describe('fetch() for resources being fetched', function() {
     it('resolves with the resource when the server responds', function() {
       var handler = sinon.spy(),
-          person = Person.create({id: 1});
+          person = Person.create({id: 1}),
+          promise1, promise2;
 
-      person.fetch();
+      promise1 = person.fetch();
       expect(person.get('isFetching')).to.be.ok;
 
-      person.fetch().done(handler);
+      promise2 = person.fetch().done(handler);
+
+      expect(promise1).to.equal(promise2);
 
       expect(handler.callCount).to.equal(0);
 
