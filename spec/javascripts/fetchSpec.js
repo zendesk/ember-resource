@@ -52,6 +52,28 @@ describe('deferred fetch', function() {
     });
   });
 
+  describe('fetch() for resources being fetched', function() {
+    it('resolves with the resource when the server responds', function() {
+      var handler = sinon.spy(),
+          person = Person.create({id: 1}),
+          promise1, promise2;
+
+      promise1 = person.fetch();
+      expect(person.get('isFetching')).to.be.ok;
+
+      promise2 = person.fetch().done(handler);
+
+      expect(promise1).to.equal(promise2);
+
+      expect(handler.callCount).to.equal(0);
+
+      server.respond();
+      expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
+
+    });
+  });
+
+
   describe('fetch() for fetched, non-expired resources', function() {
     it('should resolve with the resource immediately', function() {
       var handler = sinon.spy(),
