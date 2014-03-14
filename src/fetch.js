@@ -23,6 +23,10 @@
   var slice = Array.prototype.slice;
 
   exports.Ember.Resource.ajax = function(options) {
+    if (typeof options === "string") {
+      options = { url: '' + options };
+    }
+
     options.dataType = options.dataType || 'json';
     options.type     = options.type     || 'GET';
 
