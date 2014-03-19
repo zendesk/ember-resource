@@ -955,6 +955,8 @@
       return this;
     },
 
+    find: Ember.Resource.__find,
+
     // Create an instance of this resource. If `options` includes an
     // `id`, first check the identity map and return the existing resource
     // with that ID if found.
@@ -1249,6 +1251,8 @@
     isEmberResourceCollection: true,
     identityMapLimit: Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT * 5,
     useIdentityMap: true,
+
+    find: Ember.Resource.__find,
 
     create: function(options) {
       options = options || {};

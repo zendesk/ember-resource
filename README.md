@@ -159,7 +159,15 @@ MyApp.Comment = Ember.Resource.define({
 
 ### Fetching, Saving, and Destroying
 
-Fetch a resource with `fetch`:
+#### Fetch a resource with `find`:
+
+```javascript
+MyApp.Comment = Ember.Resource.define({...});
+MyApp.Comment.find(52).then(function(comment) {
+  // comment is an instance of MyApp.Comment
+});
+
+#### Fetch a resource with `fetch`:
 
 ```javascript
 MyApp.Comment = Ember.Resource.define({...});
@@ -169,10 +177,12 @@ MyApp.Comment.create({ id: 13 }).fetch();
 Calling `fetch` will issue an AJAX request to the resource's URL. It will
 return a [promise](http://api.jquery.com/category/deferred-object/). If the
 AJAX request responds normally, the promise will resolve with the API response
-and the resource. If it fails, the promised will fail with the AJAX error.
+and the resource. (Note that, for backwards-compatibility, this is different
+from `.find`, which resolves with just the model.) If it fails, the promise
+will fail with the AJAX error.
 
 The success callbacks for `save` and `destroyResource` have a slightly
-different signature. Those deferreds resolve with the resource and a String
+different signature. Those promises resolve with the resource and a String
 describing the action that occurred (one of
 `[ "create", "update", "destroy" ]`).
 
