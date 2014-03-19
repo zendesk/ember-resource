@@ -103,7 +103,7 @@ describe('deferred fetch', function() {
         resource.fetch();
         server.respond();
 
-        sinon.stub(resource, 'willFetch').returns($.when());
+        sinon.stub(resource, 'willFetch');
         resource.fetch();
         server.respond();
         expect(resource.willFetch.callCount).to.equal(1);
