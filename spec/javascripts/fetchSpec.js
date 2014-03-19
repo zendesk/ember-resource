@@ -1,6 +1,7 @@
 describe('deferred fetch', function() {
   var Person, people, server, person,
-      PERSON_DATA = { "id": 1, "name": "Mick Staugaard" };
+      PERSON_DATA = { "id": 1, "name": "Mick Staugaard" },
+      PEOPLE_DATA = {"people" : [ PERSON_DATA ]};
 
   beforeEach(function() {
     Person = Ember.Resource.define({
@@ -126,14 +127,37 @@ describe('deferred fetch', function() {
   });
 
 
-
-
   describe("fetch() for resource collections", function() {
     beforeEach(function() {
-      people = Ember.ResourceCollection.create({type: Person});
+      people = Ember.ResourceCollection.create({
+        type: Person,
+        parse: function(json) { return json.people; }
+      });
     });
 
-    describe('handling errors', function() {
+    describe('when being fetched', function() {
+      var handler, promise1, promise2;
+
+      beforeEach(function() {
+        handler = sinon.spy();
+        server.respondWith('GET', '/people', [200, {}, JSON.stringify(PEOPLE_DATA)]);
+        promise1 = people.fetch();
+        promise2 = people.fetch().done(handler);
+      });
+
+      it('returns the same promise for successive fetches', function() {
+        expect(promise1).to.equal(promise2);
+      });
+
+      it('resolves with the collection when the server responds', function() {
+        expect(handler.callCount).to.equal(0);
+        server.respond();
+        expect(handler.calledWith(PEOPLE_DATA, people)).to.be.ok;
+      });
+
+    });
+
+    describe('when there are errors', function() {
       beforeEach(function() {
         server.respondWith('GET', '/people', [422, {}, '[["foo", "bar"]]']);
       });

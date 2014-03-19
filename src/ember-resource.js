@@ -1149,11 +1149,11 @@
     },
 
     fetch: function(ajaxOptions) {
+      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch.promise();
+
       if (!getPath(this, 'isFetchable') || getPath(this, 'prePopulated')) return $.when(this);
 
       var self = this;
-
-      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
 
       Ember.Resource.sendEvent(self, 'willFetch');
 
