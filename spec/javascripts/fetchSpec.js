@@ -68,7 +68,8 @@ describe('deferred fetch', function() {
         promise1 = person.fetch();
         expect(person.get('isFetching')).to.be.ok;
 
-        promise2 = person.fetch().done(handler);
+        promise2 = person.fetch();
+        promise2.done(handler);
 
         expect(promise1).to.equal(promise2);
 
@@ -142,7 +143,8 @@ describe('deferred fetch', function() {
         handler = sinon.spy();
         server.respondWith('GET', '/people', [200, {}, JSON.stringify(PEOPLE_DATA)]);
         promise1 = people.fetch();
-        promise2 = people.fetch().done(handler);
+        promise2 = people.fetch();
+        promise2.done(handler);
       });
 
       it('returns the same promise for successive fetches', function() {
