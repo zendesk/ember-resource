@@ -1165,16 +1165,17 @@
           if(self.isFresh(parsedData)) {
             set(self, 'content', parsedData);
           }
+          Ember.Resource.sendEvent(self, 'didFetch');
           self.fetched().resolve(json, self);
           result.resolve(json, self);
         })
         .fail(function() {
+          Ember.Resource.sendEvent(self, 'didFail');
           var fetched = self.fetched();
           result.reject.apply(result, arguments);
           fetched.reject.apply(fetched, arguments);
         })
         .always(function() {
-          Ember.Resource.sendEvent(self, 'didFetch');
           self.deferredFetch = null;
         });
 
