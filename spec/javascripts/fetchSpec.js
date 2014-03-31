@@ -175,6 +175,12 @@ describe('deferred fetch', function() {
 
         expect(spy.calledWith(people, "read")).to.be.ok;
       });
+
+      it("collection should still be fetchable", function() {
+        people.fetch();
+        server.respond();
+        expect(people.get('isFetchable')).to.be.true;
+      });
     });
 
   });
