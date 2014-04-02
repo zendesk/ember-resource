@@ -8,21 +8,10 @@ A simple library to connect your Ember.js application to JSON backends.
 
 ## Ember Resource 2.0
 
-If you are using Ember Resource, you are probably using an unreleased copy.
-Ember Resource never had proper releases before.
+Notable `2.0` features:
 
-In order to continue development of Ember Resource while not breaking your
-application, we are marking a cutoff point for non-breaking API changes.
-[Semantic versioning][3] is a great tool for marking breaking API changes,
-but we had one problem; there were no released versions of Ember Resource.
-So, we've named our fork in the road `Ember Resource 1.0`.
-
-We're following in the footsteps of the Rails project and the Ember project and
-creating a `1-0-stable` branch. Ember Resource in its current form will live
-on in the [`1-0-stable` branch][4].
-
-Henceforth, the `master` branch of Ember Resource will undergo breaking API
-changes, and thus, will eventually be named Ember Resource 2.0.
+* The Ember Resource Clock is not enabled by default -- this has been known to cause performance problems in large applications.
+* Ember Resource `2.0` has `Ember 1.x` support.
 
 ## The Mandatory Todo Appplication
 
