@@ -712,7 +712,6 @@
 
     })
   };
-  Ember.Resource.Lifecycle.clock.start();
 
   Ember.Resource.reopen({
     isEmberResource: true,
