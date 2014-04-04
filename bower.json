@@ -15,7 +15,9 @@
   ],
   "license": "APLv2",
   "ignore": [
+    "bower_components",
     "spec",
+    "src",
     "vendor",
     "CONTRIBUTING.md",
     "Makefile",
