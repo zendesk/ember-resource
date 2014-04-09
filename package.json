@@ -25,7 +25,7 @@
     "jshint": "2.5.0",
     "broccoli": "0.7.2",
     "broccoli-concat": "0.0.5",
-    "broccoli-uglify-js": "git://github.com/shajith/broccoli-uglify-js.git#shajith/call-filter",
+    "broccoli-uglify-js": "0.1.2",
     "broccoli-merge-trees": "0.1.3"
   }
 }
