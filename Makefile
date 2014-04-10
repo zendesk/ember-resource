@@ -3,16 +3,18 @@ JSHINT  = ./node_modules/jshint/bin/jshint
 PHANTOM_JS = ./node_modules/mocha-phantomjs/bin/mocha-phantomjs
 
 dist: $(DIST_JS) $(JSHINT)
-	$(JSHINT) $<
+	@$(JSHINT) $<
 
 ci: dist test
 
 $(DIST_JS): jshint
-	mkdir -p dist
-	cat src/vendor/lru.js src/base.js src/remote_expiry.js src/identity_map.js src/fetch.js src/ember-resource.js src/debug_adapter.js > $@
+	@which broccoli > /dev/null || (echo "\n  Please install broccoli-cli: npm install -g broccoli-cli\n" && exit 1)
+	@rm -rf dist
+	@broccoli build dist
+	@echo "\n  Build successful!\n"
 
 jshint: $(JSHINT)
-	$(JSHINT) src/*.js src/vendor/*.js spec/javascripts/*Spec.js
+	@$(JSHINT) src/*.js src/vendor/*.js spec/javascripts/*Spec.js
 
 test: test-ember-09 test-ember-1
 
@@ -27,7 +29,7 @@ $(JSHINT): npm_install
 $(PHANTOM_JS): npm_install
 
 npm_install:
-	npm install
+	@npm install
 
 clean:
 	rm -rf ./dist

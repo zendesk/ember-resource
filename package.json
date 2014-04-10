@@ -22,6 +22,10 @@
     "mocha": "~1.9.0",
     "chai": "~1.6.0",
     "mocha-phantomjs": "~2.0.1",
-    "jshint": "~2.0.1"
+    "jshint": "2.5.0",
+    "broccoli": "0.7.2",
+    "broccoli-concat": "0.0.5",
+    "broccoli-uglify-js": "0.1.2",
+    "broccoli-merge-trees": "0.1.3"
   }
 }

@@ -249,6 +249,7 @@ LRUCache.prototype.toString = function() {
 
 // Export ourselves
 if (typeof this === 'object') this.LRUCache = LRUCache;
+
 (function() {
 
   window.Ember = window.Ember || window.SC;
@@ -284,6 +285,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   }());
 
 }());
+
 (function(exports) {
 
   var Ember = exports.Ember, NullTransport = {
@@ -361,6 +363,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   Ember.Resource.RemoteExpiry = RemoteExpiry;
 
 }(this));
+
 /*globals Ember, LRUCache*/
 
 (function() {
@@ -398,6 +401,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT = 500;
 
 }());
+
 (function(exports) {
 
   // Gives custom error handlers access to the resource object.
@@ -459,6 +463,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   };
 
 }(this));
+
 (function(exports) {
 
   var expandSchema, expandSchemaItem, createSchemaProperties,
@@ -1741,6 +1746,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     }
   }, Ember.Resource.Lifecycle.classMixin);
 }(this));
+
 if (Ember.DataAdapter) {
   var get = Ember.get, capitalize = Ember.String.capitalize, underscore = Ember.String.underscore;
 
