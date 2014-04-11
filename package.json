@@ -1,6 +1,6 @@
 {
   "name": "ember-resource",
-  "version": "2.0",
+  "version": "2.0.0",
   "licence": "APLv2",
   "description": "A simple library to connect your Ember.js application to JSON backends.",
   "keywords": [
