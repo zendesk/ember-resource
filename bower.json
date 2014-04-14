@@ -1,6 +1,6 @@
 {
   "name": "ember-resource",
-  "version": "2.0",
+  "version": "2.0.0",
   "homepage": "https://github.com/zendesk/ember-resource",
   "description": "A simple library to connect your Ember.js application to JSON backends.",
   "main": "dist/ember-resource.js",
@@ -22,7 +22,7 @@
     "CONTRIBUTING.md",
     "Makefile",
     "package.json"
-  ]
+  ],
   "dependencies": {
     "jquery": ">=1.7 <3",
     "ember": "1.x"
