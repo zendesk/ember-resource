@@ -64,9 +64,10 @@ describe('associations', function() {
       expect(address.get('street')).to.equal('1 My Street');
       expect(address.get('zip')).to.equal(12345);
 
-      instance.set('address', Address.create({street: '2 Your Street'}));
+      instance.set('address', Address.create({street: '2 Your Street', id: 100}));
       expect(getPath(instance, 'data.address.street')).to.equal('2 Your Street');
       expect(getPath(instance, 'data.address.zip')).to.be.undefined;
+      expect(getPath(instance, 'address_id')).to.equal(100);
     });
 
     it('should support path overriding', function() {
