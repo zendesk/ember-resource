@@ -440,21 +440,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       options.error = errorHandlerWithContext(window.Ember.Resource.errorHandler, options);
     }
 
-    var dfd = $.Deferred();
-
-    $.ajax(options).done(function() {
-      var args = slice.apply(arguments);
-      Em.run(function() {
-        dfd.resolveWith(options.context, args);
-      });
-    }).fail(function() {
-      var args = slice.apply(arguments);
-      Em.run(function() {
-        dfd.rejectWith(options.context, args);
-      });
-    });
-
-    return dfd.promise();
+    return Em.RSVP.resolve($.ajax(options));
   };
 
 
@@ -1205,19 +1191,19 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     fetched: function() {
       if (!this._fetchDfd) {
-        this._fetchDfd = $.Deferred();
+        this._fetchDfd = Ember.RSVP.defer();
       }
-      return this._fetchDfd;
-    },
+      return this._fetchDfd.promise;
+    }.on('init'),
 
     fetch: function(ajaxOptions) {
       var sideloads;
 
       if (this.deferredFetch && !getPath(this, 'isExpired')) {
-        return this.deferredFetch.promise();
+        return this.deferredFetch;
       }
 
-      if (!getPath(this, 'isFetchable')) return $.when(this.get('data'), this);
+      if (!getPath(this, 'isFetchable')) return Ember.RSVP.resolve(this.get('data'));
 
       var url = this.resourceURL();
 
@@ -1240,28 +1226,24 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         ajaxOptions.data = {include: sideloads.join(",")};
       }
 
-      var result = this.deferredFetch = $.Deferred();
+      var result = this.deferredFetch = Ember.Resource.fetch(this, ajaxOptions);
 
-      Ember.Resource.fetch(this, ajaxOptions)
-        .done(function(json) {
+      result.then(this._fetchDfd.resolve, this._fetchDfd.reject);
+
+      result
+        .then(function(json) {
           self.updateWithApiData(json);
-          self.didFetch.call(self);
+          self.didFetch();
           Ember.Resource.sendEvent(self, 'didFetch');
-          self.fetched().resolve(json, self);
-          result.resolve(json, self);
-        })
-        .fail(function() {
-          self.didFail.call(self);
+        }, function() {
+          self.didFail();
           Ember.Resource.sendEvent(self, 'didFail');
-          var fetched = self.fetched();
-          fetched.reject.apply(fetched, arguments);
-          result.reject.apply(result, arguments);
         }).
-        always(function() {
+        finally(function() {
           self.deferredFetch = null;
         });
 
-      return result.promise();
+      return result;
     },
 
     resourceURL: function() {
@@ -1322,7 +1304,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
       var deferedSave = Ember.Resource.ajax(ajaxOptions);
 
-      deferedSave.done(function(data, status, response) {
+      deferedSave.then(function(data, status, response) {
         var location = response.getResponseHeader('Location');
         if (location) {
           var id = self.constructor.idFromURL(location);
@@ -1338,7 +1320,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         self.didSave.call(self, {created: isCreate});
         Ember.Resource.sendEvent(self, 'didSave', [{created: isCreate}]);
 
-      }).fail(function() {
+      }, function() {
         self.didFail.call(self);
         Ember.Resource.sendEvent(self, 'didFail');
       });
@@ -1355,12 +1337,12 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         operation: 'destroy',
         url:  this.resourceURL(),
         resource: this
-      }).done(function() {
+      }).then(function() {
         set(self, 'resourceState', Ember.Resource.Lifecycle.DESTROYED);
         Em.run.next(function() {
           self.destroy();
         });
-      }).fail(function() {
+      }, function() {
         set(self, 'resourceState', previousState);
       });
     }
@@ -1608,43 +1590,39 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     fetched: function() {
       if (!this._fetchDfd) {
-        this._fetchDfd = $.Deferred();
+        this._fetchDfd = Ember.RSVP.defer();
       }
-      return this._fetchDfd;
+      return this._fetchDfd.promise;
     },
 
     fetch: function(ajaxOptions) {
       if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch.promise();
 
-      if (!getPath(this, 'isFetchable') || getPath(this, 'prePopulated')) return $.when(this);
+      if (!getPath(this, 'isFetchable') || getPath(this, 'prePopulated')) return Ember.RSVP.resolve(this);
 
       var self = this;
 
       Ember.Resource.sendEvent(self, 'willFetch');
 
-      var result = this.deferredFetch = $.Deferred(), parsedData;
+      var result = this.deferredFetch = this._fetch(ajaxOptions), parsedData;
 
-      this._fetch(ajaxOptions)
-        .done(function(json) {
+      result.then(this._fetchDfd.resolve, this._fetchDfd.reject);
+
+      result
+        .then(function(json) {
           parsedData = self.parse(json);
           if(self.isFresh(parsedData)) {
             set(self, 'content', parsedData);
           }
           Ember.Resource.sendEvent(self, 'didFetch');
-          self.fetched().resolve(json, self);
-          result.resolve(json, self);
-        })
-        .fail(function() {
+        }, function() {
           Ember.Resource.sendEvent(self, 'didFail');
-          var fetched = self.fetched();
-          result.reject.apply(result, arguments);
-          fetched.reject.apply(fetched, arguments);
         })
-        .always(function() {
+        .finally(function() {
           self.deferredFetch = null;
         });
 
-      return result.promise();
+      return result;
     },
 
     _resolveType: function() {
