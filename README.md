@@ -156,14 +156,13 @@ MyApp.Comment.create({ id: 13 }).fetch();
 ```
 
 Calling `fetch` will issue an AJAX request to the resource's URL. It will
-return a [promise](http://api.jquery.com/category/deferred-object/). If the
-AJAX request responds normally, the promise will resolve with the API response
-and the resource. If it fails, the promised will fail with the AJAX error.
+return a [promise](http://promises-aplus.github.io/promises-spec/). If the
+AJAX request responds normally, the promise will resolve with the API response.
+If it fails, the promised will fail with the AJAX error.
 
 The success callbacks for `save` and `destroyResource` have a slightly
-different signature. Those deferreds resolve with the resource and a String
-describing the action that occurred (one of
-`[ "create", "update", "destroy" ]`).
+different signature. Those promises resolve with the data returned
+from the server when saving or destroying the resource..
 
 Note about `destroyResource`: when you destroy a resource, the Em.Resource
 instance in memory is also `destroy`-ed, in that `.destroy()` is called on
