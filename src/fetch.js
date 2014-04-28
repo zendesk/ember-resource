@@ -36,21 +36,7 @@
       options.error = errorHandlerWithContext(window.Ember.Resource.errorHandler, options);
     }
 
-    var dfd = $.Deferred();
-
-    $.ajax(options).done(function() {
-      var args = slice.apply(arguments);
-      Em.run(function() {
-        dfd.resolveWith(options.context, args);
-      });
-    }).fail(function() {
-      var args = slice.apply(arguments);
-      Em.run(function() {
-        dfd.rejectWith(options.context, args);
-      });
-    });
-
-    return dfd.promise();
+    return Em.RSVP.resolve($.ajax(options));
   };
 
 

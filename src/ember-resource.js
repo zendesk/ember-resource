@@ -737,21 +737,20 @@
     didSave: function() {},
     didFail: function() {},
 
+    _fetchDfd: function(){ return Ember.RSVP.defer(); }.property(),
+
     fetched: function() {
-      if (!this._fetchDfd) {
-        this._fetchDfd = $.Deferred();
-      }
-      return this._fetchDfd;
+      return this.get('_fetchDfd').promise;
     },
 
     fetch: function(ajaxOptions) {
       var sideloads;
 
       if (this.deferredFetch && !getPath(this, 'isExpired')) {
-        return this.deferredFetch.promise();
+        return this.deferredFetch;
       }
 
-      if (!getPath(this, 'isFetchable')) return $.when(this.get('data'), this);
+      if (!getPath(this, 'isFetchable')) return Ember.RSVP.resolve(this.get('data'));
 
       var url = this.resourceURL();
 
@@ -774,28 +773,25 @@
         ajaxOptions.data = {include: sideloads.join(",")};
       }
 
-      var result = this.deferredFetch = $.Deferred();
+      var result = this.deferredFetch = Ember.Resource.fetch(this, ajaxOptions);
 
-      Ember.Resource.fetch(this, ajaxOptions)
-        .done(function(json) {
+      var _fetchDfd = this.get('_fetchDfd');
+      result.then(_fetchDfd.resolve, _fetchDfd.reject);
+
+      result
+        .then(function(json) {
           self.updateWithApiData(json);
-          self.didFetch.call(self);
+          self.didFetch();
           Ember.Resource.sendEvent(self, 'didFetch');
-          self.fetched().resolve(json, self);
-          result.resolve(json, self);
-        })
-        .fail(function() {
-          self.didFail.call(self);
+        }, function() {
+          self.didFail();
           Ember.Resource.sendEvent(self, 'didFail');
-          var fetched = self.fetched();
-          fetched.reject.apply(fetched, arguments);
-          result.reject.apply(result, arguments);
         }).
-        always(function() {
+        finally(function() {
           self.deferredFetch = null;
         });
 
-      return result.promise();
+      return result;
     },
 
     resourceURL: function() {
@@ -856,8 +852,8 @@
 
       var deferedSave = Ember.Resource.ajax(ajaxOptions);
 
-      deferedSave.done(function(data, status, response) {
-        var location = response.getResponseHeader('Location');
+      deferedSave.then(function(data) {
+        var location = ajaxOptions.url;
         if (location) {
           var id = self.constructor.idFromURL(location);
           if (id) {
@@ -872,7 +868,7 @@
         self.didSave.call(self, {created: isCreate});
         Ember.Resource.sendEvent(self, 'didSave', [{created: isCreate}]);
 
-      }).fail(function() {
+      }, function() {
         self.didFail.call(self);
         Ember.Resource.sendEvent(self, 'didFail');
       });
@@ -889,12 +885,12 @@
         operation: 'destroy',
         url:  this.resourceURL(),
         resource: this
-      }).done(function() {
+      }).then(function() {
         set(self, 'resourceState', Ember.Resource.Lifecycle.DESTROYED);
         Em.run.next(function() {
           self.destroy();
         });
-      }).fail(function() {
+      }, function() {
         set(self, 'resourceState', previousState);
       });
     }
@@ -1140,45 +1136,41 @@
     isEmberResourceCollection: true,
     type: Ember.required(),
 
+    _fetchDfd: function(){return Ember.RSVP.defer();}.property(),
+
     fetched: function() {
-      if (!this._fetchDfd) {
-        this._fetchDfd = $.Deferred();
-      }
-      return this._fetchDfd;
+      return this.get('_fetchDfd').promise;
     },
 
     fetch: function(ajaxOptions) {
-      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch.promise();
+      if (this.deferredFetch && !getPath(this, 'isExpired')) return this.deferredFetch;
 
-      if (!getPath(this, 'isFetchable') || getPath(this, 'prePopulated')) return $.when(this);
+      if (!getPath(this, 'isFetchable') || getPath(this, 'prePopulated')) return Ember.RSVP.resolve(this);
 
       var self = this;
 
       Ember.Resource.sendEvent(self, 'willFetch');
 
-      var result = this.deferredFetch = $.Deferred(), parsedData;
+      var result = this.deferredFetch = this._fetch(ajaxOptions), parsedData;
 
-      this._fetch(ajaxOptions)
-        .done(function(json) {
+      var _fetchDfd = this.get('_fetchDfd');
+      result.then(_fetchDfd.resolve, _fetchDfd.reject);
+
+      result
+        .then(function(json) {
           parsedData = self.parse(json);
           if(self.isFresh(parsedData)) {
             set(self, 'content', parsedData);
           }
           Ember.Resource.sendEvent(self, 'didFetch');
-          self.fetched().resolve(json, self);
-          result.resolve(json, self);
-        })
-        .fail(function() {
+        }, function() {
           Ember.Resource.sendEvent(self, 'didFail');
-          var fetched = self.fetched();
-          result.reject.apply(result, arguments);
-          fetched.reject.apply(fetched, arguments);
         })
-        .always(function() {
+        .finally(function() {
           self.deferredFetch = null;
         });
 
-      return result.promise();
+      return result;
     },
 
     _resolveType: function() {
