@@ -58,13 +58,16 @@ describe('Destroying resources', function() {
       it('should defer destroying the Em.Resource instance till the next run loop', function(done) {
         expect(resource.get('isDestroyed')).to.not.be.ok;
 
-        // The destroy happens in the "next" run loop.
+        // The destroy happens in the "next" next run loop.
         Em.run.next(function() {
-
-          // In the loop *after* that one, we check the resource state.
+          // The destroy happens in the "next" run loop.
           Em.run.next(function() {
-            expect(resource.get('isDestroyed')).to.be.ok;
-            done();
+
+            // In the loop *after* that one, we check the resource state.
+            Em.run.next(function() {
+              expect(resource.get('isDestroyed')).to.be.ok;
+              done();
+            });
           });
         });
       });

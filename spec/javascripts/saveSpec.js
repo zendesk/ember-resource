@@ -82,19 +82,25 @@ describe('Saving a resource instance', function() {
         expect(resource.get('isSaving')).to.equal(true);
       });
 
-      it('should change to previous state after save completes', function() {
+      it('should change to previous state after save completes', function(done) {
         var previousState = resource.get('resourceState');
         expect(resource.save()).to.be.ok;
         expect(resource.get('resourceState')).not.to.equal(previousState);
         server.respond();
-        expect(resource.get('resourceState')).to.equal(previousState);
+        Ember.run.next(function(){
+            expect(resource.get('resourceState')).to.equal(previousState);
+            done();
+        });
       });
 
-      it('should not allow concurrent saves', function() {
+      it('should not allow concurrent saves', function(done) {
         expect(resource.save()).to.be.ok;
         expect(resource.save()).to.equal(false);
         server.respond();
-        expect(resource.save()).to.be.ok;
+        Ember.run.next(function(){
+          expect(resource.save()).to.be.ok;
+          done();
+        });
       });
 
       it("should not allow setting the value of isSaving", function() {
@@ -118,8 +124,11 @@ describe('Saving a resource instance', function() {
         server.respond();
       });
 
-      it('should call "didSave"', function() {
-        expect(resource.didSave.called).to.be.ok;
+      it('should call "didSave"', function(done) {
+        Ember.run.next(function(){
+          expect(resource.didSave.called).to.be.ok;
+          done();
+        });
       });
     });
 
@@ -146,8 +155,11 @@ describe('Saving a resource instance', function() {
         server.respond();
       });
 
-      it('should pass created: true to didSave', function() {
-        expect(resource.didSave.calledWith({created: true})).to.be.ok;
+      it('should pass created: true to didSave', function(done) {
+        Ember.run.next(function(){
+          expect(resource.didSave.calledWith({created: true})).to.be.ok;
+          done();
+        });
       });
     });
 
@@ -160,8 +172,11 @@ describe('Saving a resource instance', function() {
         server.respond();
       });
 
-      it('should pass created: false to didSave', function() {
-        expect(resource.didSave.calledWith({created: false})).to.be.ok;
+      it('should pass created: false to didSave', function(done) {
+        Ember.run.next(function(){
+          expect(resource.didSave.calledWith({created: false})).to.be.ok;
+          done();
+        });
       });
     });
 
@@ -209,12 +224,15 @@ describe('Saving a resource instance', function() {
         resource = Model.create({ name: 'foo' });
       });
 
-      it('should update with the data given', function() {
+      it('should update with the data given', function(done) {
         resource.save();
         server.respond();
-        expect(resource.get('id')).to.equal(1);
-        expect(resource.get('subject')).to.equal('the subject');
-        expect(resource.get('name')).to.equal('foo');
+        Ember.run.next(function(){
+          expect(resource.get('id')).to.equal(1);
+          expect(resource.get('subject')).to.equal('the subject');
+          expect(resource.get('name')).to.equal('foo');
+          done();
+        });
       });
 
       it('should not update with the data if you pass the update: false option', function() {
@@ -246,11 +264,14 @@ describe('Saving a resource instance', function() {
           resource = Person.create({ name: 'foo' }, { address: { street: 'bar' } });
         });
 
-        it("should update with the data given", function() {
+        it("should update with the data given", function(done) {
           resource.save();
           server.respond();
-          expect(resource.get('id')).to.equal(1);
-          expect(getPath(resource, 'address.street')).to.equal('baz');
+          Ember.run.next(function(){
+            expect(resource.get('id')).to.equal(1);
+            expect(getPath(resource, 'address.street')).to.equal('baz');
+            done();
+          });
         });
       });
     });

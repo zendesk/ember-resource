@@ -27,16 +27,19 @@ describe('deferred fetch', function() {
                           JSON.stringify(PERSON_DATA) ]);
     });
 
-    it("should resolve with the resource when the fetch completes", function() {
+    it("should resolve with the resource when the fetch completes", function(done) {
       var handler = sinon.spy();
 
       person = Person.create({id: 1});
-      person.fetched().done(handler);
+      person.fetched().then(handler);
 
       person.fetch();
       server.respond();
 
-      expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
+      Em.run.next(function(){
+        expect(handler.calledWith(PERSON_DATA)).to.be.ok;
+        done();
+      });
     });
   });
 
@@ -50,18 +53,21 @@ describe('deferred fetch', function() {
     });
 
     describe('when unfetched', function() {
-      it('resolves with the resource when the server responds', function() {
+      it('resolves with the resource when the server responds', function(done) {
         var handler = sinon.spy();
 
-        person.fetch().done(handler);
+        person.fetch().then(handler);
         server.respond();
 
-        expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
+        Em.run.next(function(){
+          expect(handler.calledWith(PERSON_DATA)).to.be.ok;
+          done();
+        });
       });
     });
 
     describe('when being fetched', function() {
-      it('resolves with the resource when the server responds', function() {
+      it('resolves with the resource when the server responds', function(done) {
         var handler = sinon.spy(),
             promise1, promise2;
 
@@ -69,27 +75,33 @@ describe('deferred fetch', function() {
         expect(person.get('isFetching')).to.be.ok;
 
         promise2 = person.fetch();
-        promise2.done(handler);
+        promise2.then(handler);
 
         expect(promise1).to.equal(promise2);
 
         expect(handler.callCount).to.equal(0);
 
         server.respond();
-        expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
+        Em.run.next(function(){
+          expect(handler.calledWith(PERSON_DATA)).to.be.ok;
+          done();
+        });
 
       });
     });
 
     describe('when fetched, but not expired', function() {
-      it('should resolve with the resource immediately', function() {
+      it('should resolve with the resource immediately', function(done) {
         var handler = sinon.spy();
 
         person.fetch();
         server.respond();
 
-        person.fetch().done(handler);
-        expect(handler.calledWith(PERSON_DATA, person)).to.be.ok;
+        person.fetch().then(handler);
+        Em.run.next(function(){
+          expect(handler.calledWith(PERSON_DATA)).to.be.ok;
+          done();
+        });
       });
     });
 
@@ -98,16 +110,20 @@ describe('deferred fetch', function() {
         server.respondWith('GET', '/people/2', [422, {}, '[["foo", "bar"]]']);
       });
 
-      it('should not prevent subsequent fetches from happening', function() {
+      it('should not prevent subsequent fetches from happening', function(done) {
         var resource = Person.create({ id: 2 });
 
         resource.fetch();
         server.respond();
 
         sinon.stub(resource, 'willFetch');
-        resource.fetch();
-        server.respond();
-        expect(resource.willFetch.callCount).to.equal(1);
+
+        Em.run.next(function(){
+          resource.fetch();
+          server.respond();
+          expect(resource.willFetch.callCount).to.equal(1);
+          done();
+        });
       });
 
       it('should pass a reference to the resource to the error handling function', function() {
@@ -144,17 +160,20 @@ describe('deferred fetch', function() {
         server.respondWith('GET', '/people', [200, {}, JSON.stringify(PEOPLE_DATA)]);
         promise1 = people.fetch();
         promise2 = people.fetch();
-        promise2.done(handler);
+        promise2.then(handler);
       });
 
       it('returns the same promise for successive fetches', function() {
         expect(promise1).to.equal(promise2);
       });
 
-      it('resolves with the collection when the server responds', function() {
+      it('resolves with the collection when the server responds', function(done) {
         expect(handler.callCount).to.equal(0);
         server.respond();
-        expect(handler.calledWith(PEOPLE_DATA, people)).to.be.ok;
+        Ember.run.next(function(){
+          expect(handler.calledWith(PEOPLE_DATA)).to.be.ok;
+          done();
+        });
       });
 
     });
@@ -176,10 +195,13 @@ describe('deferred fetch', function() {
         expect(spy.calledWith(people, "read")).to.be.ok;
       });
 
-      it("collection should still be fetchable", function() {
+      it("collection should still be fetchable", function(done) {
         people.fetch();
         server.respond();
-        expect(people.get('isFetchable')).to.be.true;
+        Ember.run.next(function(){
+          expect(people.get('isFetchable')).to.be.true;
+          done();
+        });
       });
     });
 
@@ -199,13 +221,13 @@ describe('deferred fetch', function() {
 
       people.expire();
 
-      people.fetched().done(handler);
+      people.fetched().then(handler);
 
       people.fetch();
       server.respond();
 
       setTimeout(function() {
-        expect(handler.calledWith([PERSON_DATA], people)).to.be.ok;
+        expect(handler.calledWith([PERSON_DATA])).to.be.ok;
         done();
       }, 1000);
     });
