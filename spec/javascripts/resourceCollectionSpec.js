@@ -47,10 +47,13 @@ describe('ResourceCollection', function() {
       expect(this.collection.get('prePopulated')).to.be.ok;
     });
 
-    it('returns a resolved deferred for #fetch', function() {
+    it('returns a resolved deferred for #fetch', function(done) {
       var result = this.collection.fetch();
       expect(result).not.to.be.undefined;
-      expect(result.state()).to.equal('resolved');
+      Ember.run.next(function(){
+        expect(result._state).to.equal(1);
+        done();
+      });
     });
 
   });
@@ -113,10 +116,13 @@ describe('ResourceCollection', function() {
         isFresh.returns(true);
       });
 
-      it("should update data", function() {
+      it("should update data", function(done) {
         collection.fetch();
         server.respond();
-        expect(collection.get("length")).to.equal(1);
+        Ember.run.next(function(){
+          expect(collection.get("length")).to.equal(1);
+          done();
+        });
       });
     });
 

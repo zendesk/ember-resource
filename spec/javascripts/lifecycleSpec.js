@@ -60,8 +60,11 @@ describe('Lifecycle', function() {
         server.respond();
       });
 
-      it('should put the object in a FETCHED state when the fetch is done', function() {
-        expect(person.get('resourceState')).to.equal(Ember.Resource.Lifecycle.FETCHED);
+      it('should put the object in a FETCHED state when the fetch is done', function(done) {
+        Ember.run.next(function(){
+          expect(person.get('resourceState')).to.equal(Ember.Resource.Lifecycle.FETCHED);
+          done();
+        });
       });
 
       it('should set expiry in 5 minutes', function() {

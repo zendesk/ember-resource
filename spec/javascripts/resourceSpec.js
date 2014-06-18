@@ -18,7 +18,7 @@ describe('A Resource instance', function () {
     describe("with a sideloads attribute", function() {
       var subject;
       beforeEach(function() {
-        sinon.stub(Ember.Resource, 'ajax').returns($.when());
+        sinon.stub(Ember.Resource, 'ajax').returns(Ember.RSVP.resolve());
         subject = Ember.Resource.define({
           url: "/users",
           sideloads: ["abilities", "weapons"]
@@ -236,10 +236,13 @@ describe('A Resource instance', function () {
         isFresh.returns(true);
       });
 
-      it("should update data", function() {
+      it("should update data", function(done) {
         model.fetch();
         server.respond();
-        expect(model.get("name")).to.equal("Foo");
+        Ember.run.next(function(){
+          expect(model.get("name")).to.equal("Foo");
+          done();
+        });
       });
     });
 
