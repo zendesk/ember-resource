@@ -169,6 +169,15 @@ describe('schema definition', function() {
 
     instance.set('updatedAt', dateString);
     expect(getPath(instance, 'data.updatedAt')).to.equal(dateString, 'convert a string ("' + dateString + '") to a string');
+
+    instance.updateWithApiData({ createdAt: '' });
+    expect(getPath(instance, 'createdAt')).to.equal('');
+
+    instance.updateWithApiData({ createdAt: null });
+    expect(getPath(instance, 'createdAt')).to.equal.null;
+
+    instance.updateWithApiData({ createdAt: undefined });
+    expect(getPath(instance, 'createdAt')).to.be.undefined;
   });
 
   it('should create Boolean properties', function() {
