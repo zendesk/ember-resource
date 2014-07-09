@@ -478,7 +478,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   }
 
   function isObject(obj) {
-    return obj === Object(obj);
+    return Ember.typeOf(obj) === 'object';
   }
 
   // Used when evaluating schemas to turn a type String into a class.
@@ -495,7 +495,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     var key = path.shift();
 
     if (path.length === 0) {
-      if (typeof value === 'object') {
+      if (isObject(value)) {
         set(obj, key, Em.copy(value, true));
       } else {
         set(obj, key, value);
@@ -522,7 +522,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         oldValue = getPath(objA, key);
         newValue = getPath(objB, key);
 
-        if (Ember.typeOf(newValue) === 'object' && Ember.typeOf(oldValue) === 'object') {
+        if (isObject(newValue) && isObject(oldValue)) {
           Ember.propertyWillChange(objA, key);
           Ember.Resource.deepMerge(oldValue, newValue);
           Ember.propertyDidChange(objA, key);
@@ -729,7 +729,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   Ember.Resource.DateAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: Date,
     typeCast: function(value) {
-      if (value === undefined || value === null || Ember.typeOf(value) === 'date') {
+      if (!value || Ember.typeOf(value) === 'date') {
         return value;
       } else {
         return new Date(value);
@@ -1339,7 +1339,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
           }
         }
 
-        if (options.update !== false && Ember.typeOf(data) === 'object') {
+        if (options.update !== false && isObject(data)) {
           self.updateWithApiData(data);
         }
 
