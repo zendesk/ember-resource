@@ -29,7 +29,11 @@
     var key = path.shift();
 
     if (path.length === 0) {
-      set(obj, key, value);
+      if (typeof value === 'object') {
+        set(obj, key, Em.copy(value));
+      } else {
+        set(obj, key, value);
+      }
     } else {
       var newObj = getPath(obj, key);
 

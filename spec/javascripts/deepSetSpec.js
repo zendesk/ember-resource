@@ -29,4 +29,29 @@ describe('deepSet', function() {
     expect(obj.a.b.c).to.equal('foo');
   });
 
+  it("should not pass a reference to another objects data", function() {
+    var ticket = {
+      data: {
+        group: {
+          id: 1,
+          name: 'Support'
+        }
+      }
+    };
+
+    var group = {
+      data: {
+        id: 2,
+        name: 'Development'
+      }
+    };
+
+    Ember.Resource.deepSet(ticket, 'data.group', group.data);
+
+    expect(ticket.data.group.id).to.equal(group.data.id);
+    expect(ticket.data.group.name).to.equal(group.data.name);
+
+    expect(ticket.data.group).not.to.equal(group.data);
+  });
+
 });

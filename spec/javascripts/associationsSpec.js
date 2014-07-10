@@ -1,5 +1,6 @@
 describe('associations', function() {
   var getPath = Ember.Resource.getPath;
+  var newId = 100;
 
   var Address = Ember.Resource.define({
     schema: {
@@ -43,6 +44,7 @@ describe('associations', function() {
       data = {
         name: 'Joe Doe',
         address: {
+          id: newId++,
           street: '1 My Street',
           zip: 12345
         }
@@ -113,6 +115,22 @@ describe('associations', function() {
       expect(instance.get('address_id')).to.equal(2);
       expect(instance.get('address')).not.to.equal(address);
       expect(getPath(instance, 'address.id')).to.equal(2);
+    });
+
+    it("should not share internal data with other objects", function() {
+      var Person = Ember.Resource.define({
+        schema: {
+          id: Number,
+          name: String,
+          address: { type: Address, nested: true }
+        }
+      });
+
+      var person = Person.create({}, data);
+      var newAddress = Address.create({ id: newId++, street: '2 Main Street' });
+
+      person.set('address', newAddress);
+      expect(person.get('data').address).not.to.equal(newAddress.get('data'));
     });
   });
 
