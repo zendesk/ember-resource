@@ -132,6 +132,36 @@ describe('associations', function() {
       person.set('address', newAddress);
       expect(person.get('data').address).not.to.equal(newAddress.get('data'));
     });
+
+    describe('nullable behavior', function() {
+      var Person, instance;
+      beforeEach(function() {
+        Person = Ember.Resource.define({
+          schema: {
+            name: String,
+            address: {type: Address, nested: true}
+          }
+        });
+      });
+
+      it('should nullify the id attribute when the association is nullified', function() {
+        instance = Person.create({}, data);
+        expect(instance.get('address_id')).not.to.equal(null);
+
+        instance.set('address', null);
+        expect(instance.get('address_id')).to.equal(null);
+
+      });
+
+      it('should nullify the association when the id attribute is nullified', function() {
+        instance = Person.create({}, data);
+        expect(instance.get('address')).not.to.equal(null);
+
+        instance.set('address_id', null);
+        expect(instance.get('address')).to.equal(null);
+
+      });
+    });
   });
 
   describe('has many', function() {

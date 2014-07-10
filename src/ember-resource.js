@@ -347,7 +347,11 @@
       return getPath(instance, this.get('path'));
     },
     setValue: function(instance, value) {
-      set(instance, getPath(this, 'association.name'), {id: value});
+      if(value == null) {
+        set(instance, getPath(this, 'association.name'), null);
+      } else {
+        set(instance, getPath(this, 'association.name'), {id: value});
+      }
     }
   });
   Ember.Resource.HasOneNestedIdSchemaItem.reopenClass({
