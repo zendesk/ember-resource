@@ -30,7 +30,7 @@
 
     if (path.length === 0) {
       if (typeof value === 'object') {
-        set(obj, key, Em.copy(value));
+        set(obj, key, Em.copy(value, true));
       } else {
         set(obj, key, value);
       }

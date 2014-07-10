@@ -34,7 +34,11 @@ describe('deepSet', function() {
       data: {
         group: {
           id: 1,
-          name: 'Support'
+          name: 'Support',
+          users: {
+            id: 3,
+            name: 'User 1'
+          }
         }
       }
     };
@@ -42,7 +46,11 @@ describe('deepSet', function() {
     var group = {
       data: {
         id: 2,
-        name: 'Development'
+        name: 'Development',
+        users: {
+          id: 4,
+          name: 'User 2'
+        }
       }
     };
 
@@ -52,6 +60,7 @@ describe('deepSet', function() {
     expect(ticket.data.group.name).to.equal(group.data.name);
 
     expect(ticket.data.group).not.to.equal(group.data);
+    expect(ticket.data.group.users).not.to.equal(group.data.users);
   });
 
 });
