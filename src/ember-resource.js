@@ -30,7 +30,7 @@
     var key = path.shift();
 
     if (path.length === 0) {
-      if (typeof value === 'object') {
+      if (isObject(value)) {
         set(obj, key, Em.copy(value, true));
       } else {
         set(obj, key, value);
