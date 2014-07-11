@@ -11,9 +11,8 @@
     return Ember.typeOf(obj) === 'string';
   }
 
-  var objectType = 'object';
   function isObject(obj) {
-    return Ember.typeOf(obj) === objectType;
+    return Ember.typeOf(obj) === 'object';
   }
 
   // Used when evaluating schemas to turn a type String into a class.
