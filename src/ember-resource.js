@@ -12,7 +12,7 @@
   }
 
   function isObject(obj) {
-    return obj === Object(obj);
+    return Ember.typeOf(obj) === 'object';
   }
 
   // Used when evaluating schemas to turn a type String into a class.
@@ -29,7 +29,7 @@
     var key = path.shift();
 
     if (path.length === 0) {
-      if (typeof value === 'object') {
+      if (isObject(value)) {
         set(obj, key, Em.copy(value, true));
       } else {
         set(obj, key, value);
@@ -56,7 +56,7 @@
         oldValue = getPath(objA, key);
         newValue = getPath(objB, key);
 
-        if (Ember.typeOf(newValue) === 'object' && Ember.typeOf(oldValue) === 'object') {
+        if (isObject(newValue) && isObject(oldValue)) {
           Ember.propertyWillChange(objA, key);
           Ember.Resource.deepMerge(oldValue, newValue);
           Ember.propertyDidChange(objA, key);
@@ -873,7 +873,7 @@
           }
         }
 
-        if (options.update !== false && Ember.typeOf(data) === 'object') {
+        if (options.update !== false && isObject(data)) {
           self.updateWithApiData(data);
         }
 
