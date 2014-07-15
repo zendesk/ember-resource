@@ -263,7 +263,7 @@
   Ember.Resource.DateAttributeSchemaItem = Ember.Resource.AttributeSchemaItem.extend({
     theType: Date,
     typeCast: function(value) {
-      if (value === undefined || value === null || Ember.typeOf(value) === 'date') {
+      if (!value || Ember.typeOf(value) === 'date') {
         return value;
       } else {
         return new Date(value);
