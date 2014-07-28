@@ -763,7 +763,7 @@
 
       var url = this.resourceURL();
 
-      if (!url) return;
+      if (!url) return $.when(this.get('data'), this);
 
       var self = this;
 

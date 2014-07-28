@@ -93,6 +93,18 @@ describe('deferred fetch', function() {
       });
     });
 
+    describe('for resources with no resourceURL', function() {
+      it("returns a resolved promise", function() {
+        var handler = sinon.spy();
+        person.resourceURL = function() { return undefined; };
+
+        person.fetch().done(handler);
+        expect(handler.callCount).to.equal(1);
+        expect(handler.getCall(0).args[0].id).to.equal(person.get('id'));
+        expect(handler.getCall(0).args[1]).to.equal(person);
+      });
+    });
+
     describe('when there are errors', function() {
       beforeEach(function() {
         server.respondWith('GET', '/people/2', [422, {}, '[["foo", "bar"]]']);
