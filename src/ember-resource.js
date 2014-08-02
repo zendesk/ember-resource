@@ -97,7 +97,7 @@
 
     propertyFunction: function(name, value) {
       var schemaItem = this.constructor.schema[name];
-      if (arguments.length === 2) {
+      if (arguments.length > 1) {
         this.resourcePropertyWillChange(name, value);
         schemaItem.setValue.call(schemaItem, this, value);
         value = schemaItem.getValue.call(schemaItem, this);
