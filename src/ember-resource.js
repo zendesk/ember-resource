@@ -319,8 +319,9 @@
         // If a subsequent fetch call only updates the id in the data.path hash,
         // next time a instance.get(path) call is made, it would fetch id from
         // the identityMap and update with whatever is present in data.path hash
-        if (value.get('id')) {
-          set(instance, this.get('path') + '_id', value.get('id'));
+        var valueId = getPath(value ,'id');
+        if (valueId) {
+          set(instance, this.get('name') + '_id', valueId);
         } else {
           Ember.Resource.deepSet(data, this.get('path'), getPath(value, 'data'));
         }
