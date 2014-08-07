@@ -147,8 +147,13 @@ describe('associations', function() {
       var newAddress = Address.create({ id: newAddressId, street: '2 Main Street' });
 
       person.set('address', newAddress);
-      expect(person.get('data').address.street).not.to.equal('2 Main Street');
       expect(person.get('data').address.id).to.equal(newAddressId);
+
+      // update the local data:
+      expect(person.get('address').get('street')).to.equal('2 Main Street');
+
+      // but don't modify what we got from the server:
+      expect(person.get('data.address.street')).not.to.equal('2 Main Street');
     });
 
     describe('nullable behavior', function() {
