@@ -5,7 +5,8 @@
 
   var Ember = exports.Ember,
       getPath = Ember.Resource.getPath,
-      set = Ember.set;
+      set = Ember.set,
+      get = Ember.get;
 
   function isString(obj) {
     return Ember.typeOf(obj) === 'string';
@@ -621,6 +622,9 @@
         });
 
         Ember.addListener(this, 'didFetch', this, function() {
+          if(!get(self, 'hasBeenFetched')) {
+            set(self, 'hasBeenFetched', true);
+          }
           set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
           updateExpiry();
         });
@@ -657,6 +661,9 @@
       isFetched: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
       }).cacheable(),
+
+
+      hasBeenFetched: false,
 
       isSavable: Ember.computed('resourceState', function(key, value) {
         var state = getPath(this, 'resourceState');

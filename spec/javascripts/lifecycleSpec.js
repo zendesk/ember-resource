@@ -31,6 +31,10 @@ describe('Lifecycle', function() {
       expect(person.get('resourceState')).to.equal(Ember.Resource.Lifecycle.UNFETCHED);
     });
 
+    it('should not be marked as having been fetched', function() {
+      expect(person.get('hasBeenFetched')).to.be.false;
+    });
+
     it('should not be expired', function() {
       expect(person.get('isExpired')).to.not.be.ok;
     });
@@ -62,6 +66,10 @@ describe('Lifecycle', function() {
 
       it('should put the object in a FETCHED state when the fetch is done', function() {
         expect(person.get('resourceState')).to.equal(Ember.Resource.Lifecycle.FETCHED);
+      });
+
+      it('should mark the object as having been fetched', function() {
+        expect(person.get('hasBeenFetched')).to.be.true;
       });
 
       it('should set expiry in 5 minutes', function() {
