@@ -630,6 +630,9 @@
         });
 
         Ember.addListener(this, 'didFetch', this, function() {
+          if(!getPath(self, 'hasBeenFetched')) {
+            set(self, 'hasBeenFetched', true);
+          }
           set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
           updateExpiry();
         });
@@ -666,6 +669,9 @@
       isFetched: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
       }).cacheable(),
+
+
+      hasBeenFetched: false,
 
       isSavable: Ember.computed('resourceState', function(key, value) {
         var state = getPath(this, 'resourceState');
