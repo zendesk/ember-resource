@@ -5,8 +5,7 @@
 
   var Ember = exports.Ember,
       getPath = Ember.Resource.getPath,
-      set = Ember.set,
-      get = Ember.get;
+      set = Ember.set;
 
   function isString(obj) {
     return Ember.typeOf(obj) === 'string';
@@ -622,7 +621,7 @@
         });
 
         Ember.addListener(this, 'didFetch', this, function() {
-          if(!get(self, 'hasBeenFetched')) {
+          if(!getPath(self, 'hasBeenFetched')) {
             set(self, 'hasBeenFetched', true);
           }
           set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
