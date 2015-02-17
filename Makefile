@@ -16,13 +16,13 @@ $(DIST_JS): jshint
 jshint: $(JSHINT)
 	@$(JSHINT) src/*.js src/vendor/*.js spec/javascripts/*Spec.js
 
-test: test-ember-09 test-ember-1
+test: test-ember-current test-ember-next
 
-test-ember-09: jshint $(PHANTOM_JS)
+test-ember-current: jshint $(PHANTOM_JS)
 	$(PHANTOM_JS) spec/runner.html
 
-test-ember-1: jshint $(PHANTOM_JS)
-	$(PHANTOM_JS) spec/runner-1.0.html
+test-ember-next: jshint $(PHANTOM_JS)
+	$(PHANTOM_JS) spec/runner-next.html
 
 $(JSHINT): npm_install
 
