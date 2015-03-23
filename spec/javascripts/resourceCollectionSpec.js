@@ -134,4 +134,112 @@ describe('ResourceCollection', function() {
 
   });
 
+  describe("with primitive wrapper object", function() {
+
+    it("String should pass fetch()", function() {
+      var server = sinon.fakeServer.create();
+      server.respondWith("GET", "/localizations",
+                         [200, { "Content-Type": "application/json" },
+                          JSON.stringify(["en_US"]) ]);
+
+      var collection = Em.ResourceCollection.extend({
+        type: String,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create();
+
+      collection.fetch();
+      server.respond();
+      expect(collection.get("length")).to.equal(1);
+
+      server.restore();
+    });
+
+    it("String should pass toJSON()", function() {
+
+      var collection = Em.ResourceCollection.extend({
+        type: String,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create({ content: [] });
+
+      collection.pushObject("en_US");
+      expect(collection.toJSON().length).to.equal(1);
+
+    });
+
+
+    it("Number should pass fetch()", function() {
+      var server = sinon.fakeServer.create();
+      server.respondWith("GET", "/localizations",
+                         [200, { "Content-Type": "application/json" },
+                          JSON.stringify([1]) ]);
+
+      var collection = Em.ResourceCollection.extend({
+        type: Number,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create();
+
+      collection.fetch();
+      server.respond();
+      expect(collection.get("length")).to.equal(1);
+
+      server.restore();
+    });
+
+    it("Number should pass toJSON()", function() {
+
+      var collection = Em.ResourceCollection.extend({
+        type: String,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create({ content: [] });
+
+      collection.pushObject(1);
+      expect(collection.toJSON().length).to.equal(1);
+
+    });
+
+    it("Boolean should pass fetch()", function() {
+      var server = sinon.fakeServer.create();
+      server.respondWith("GET", "/localizations",
+                         [200, { "Content-Type": "application/json" },
+                          JSON.stringify([true, false]) ]);
+
+      var collection = Em.ResourceCollection.extend({
+        type: Boolean,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create();
+
+      collection.fetch();
+      server.respond();
+      expect(collection.get("length")).to.equal(2);
+
+      server.restore();
+    });
+
+    it("Boolean should pass toJSON()", function() {
+
+      var collection = Em.ResourceCollection.extend({
+        type: String,
+        url: function() {
+          return '/localizations';
+        }.property().cacheable()
+      }).create({ content: [] });
+
+      collection.pushObject(true);
+      collection.pushObject(false);
+      expect(collection.toJSON().length).to.equal(2);
+
+    });
+
+  });
+
 });
