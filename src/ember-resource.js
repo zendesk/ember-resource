@@ -11,8 +11,20 @@
     return Ember.typeOf(obj) === 'string';
   }
 
+  function isNumber(obj) {
+    return Ember.typeOf(obj) === 'number';
+  }
+
+  function isBoolean(obj) {
+    return Ember.typeOf(obj) === 'boolean';
+  }
+
   function isObject(obj) {
     return Ember.typeOf(obj) === 'object';
+  }
+
+  function isFunction(obj) {
+    return Ember.typeOf(obj) === 'function';
   }
 
   // Used when evaluating schemas to turn a type String into a class.
@@ -1229,6 +1241,12 @@
       return items.map(function(item) {
         if (item instanceof this.type) {
           return item;
+        } else if(isString(item) && isFunction(this.type) && (this.type === String) ) {
+          return item;
+        } else if(isNumber(item) && isFunction(this.type) && (this.type === Number) ) {
+          return item;
+        } else if(isBoolean(item) && isFunction(this.type) && (this.type === Boolean) ) {
+          return item;
         } else {
           return this.type.create({}, item);
         }
@@ -1258,7 +1276,7 @@
 
     toJSON: function () {
       return this.map(function (item) {
-        return item.toJSON();
+        return (typeof item.toJSON !== 'undefined') ? item.toJSON() : item;
       });
     }
 
