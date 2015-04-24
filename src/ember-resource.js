@@ -88,7 +88,7 @@
       var deps = ['data.' + this.get('path')];
 
       return deps;
-    }).cacheable(),
+    }),
 
     data: function(instance) {
       return getPath(instance, 'data');
@@ -105,7 +105,7 @@
         }
       }
       return type;
-    }).cacheable(),
+    }),
 
     propertyFunction: function(name, value) {
       var schemaItem = this.constructor.schema[name];
@@ -122,7 +122,7 @@
 
     property: function() {
       var cp = new Ember.ComputedProperty(this.propertyFunction);
-      return cp.property.apply(cp, this.get('dependencies')).cacheable();
+      return cp.property.apply(cp, this.get('dependencies'));
     },
 
     toJSON: function(instance) {
@@ -432,7 +432,7 @@
         }
       }
       return type;
-    }).cacheable()
+    })
   });
 
   Ember.Resource.HasManySchemaItem.reopenClass({
@@ -672,15 +672,15 @@
 
       isInitializing: Ember.computed('resourceState', function (key, value) {
         return (getPath(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
-      }).cacheable(),
+      }),
 
       isFetching: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHING;
-      }).cacheable(),
+      }),
 
       isFetched: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
-      }).cacheable(),
+      }),
 
 
       hasBeenFetched: false,
@@ -695,11 +695,11 @@
         ];
 
         return state && !unsavableState.contains(state);
-      }).cacheable(),
+      }),
 
       isSaving: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
-      }).cacheable(),
+      }),
 
       // Notify dependents on volatile properties
       resourceStateDidChange: function() {
@@ -860,7 +860,7 @@
 
     isNew: Ember.computed('id', function() {
       return !getPath(this, 'id');
-    }).cacheable(),
+    }),
 
     save: function(options) {
       options = options || {};
@@ -1266,13 +1266,13 @@
       var content = getPath(this, 'content');
       var length = content ? getPath(content, 'length') : 0;
       return length;
-    }).cacheable(),
+    }),
 
     content: Ember.computed(function(name, value) {
       if (arguments.length === 2) { // setter
         return this.instantiateItems(value);
       }
-    }).cacheable(),
+    }),
 
     toJSON: function () {
       return this.map(function (item) {
