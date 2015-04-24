@@ -174,7 +174,7 @@ Em.Resource instance to work without any errors.
 
 ## Testing
 
-![Travis CI Build Status](https://api.travis-ci.org/zendesk/ember-resource.svg)
+[![Travis CI Build Status](https://api.travis-ci.org/zendesk/ember-resource.svg)](https://travis-ci.org/zendesk/ember-resource)
 
 Tests can be run from the command line, or in a browser:
 
