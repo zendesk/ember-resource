@@ -477,8 +477,20 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     return Ember.typeOf(obj) === 'string';
   }
 
+  function isNumber(obj) {
+    return Ember.typeOf(obj) === 'number';
+  }
+
+  function isBoolean(obj) {
+    return Ember.typeOf(obj) === 'boolean';
+  }
+
   function isObject(obj) {
     return Ember.typeOf(obj) === 'object';
+  }
+
+  function isFunction(obj) {
+    return Ember.typeOf(obj) === 'function';
   }
 
   // Used when evaluating schemas to turn a type String into a class.
@@ -542,7 +554,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       var deps = ['data.' + this.get('path')];
 
       return deps;
-    }).cacheable(),
+    }),
 
     data: function(instance) {
       return getPath(instance, 'data');
@@ -559,11 +571,11 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         }
       }
       return type;
-    }).cacheable(),
+    }),
 
     propertyFunction: function(name, value) {
       var schemaItem = this.constructor.schema[name];
-      if (arguments.length === 2) {
+      if (arguments.length > 1) {
         this.resourcePropertyWillChange(name, value);
         schemaItem.setValue.call(schemaItem, this, value);
         value = schemaItem.getValue.call(schemaItem, this);
@@ -576,7 +588,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     property: function() {
       var cp = new Ember.ComputedProperty(this.propertyFunction);
-      return cp.property.apply(cp, this.get('dependencies')).cacheable();
+      return cp.property.apply(cp, this.get('dependencies'));
     },
 
     toJSON: function(instance) {
@@ -781,10 +793,19 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       if (!data) return;
 
       if (value instanceof this.get('type')) {
-        value = getPath(value, 'data');
+        // Copying value data containing an id might be dangerous
+        // If a subsequent fetch call only updates the id in the data.path hash,
+        // next time a instance.get(path) call is made, it would fetch id from
+        // the identityMap and update with whatever is present in data.path hash
+        var valueId = getPath(value ,'id');
+        if (valueId) {
+          set(instance, this.get('name') + '_id', valueId);
+        } else {
+          Ember.Resource.deepSet(data, this.get('path'), getPath(value, 'data'));
+        }
+      } else {
+        Ember.Resource.deepSet(data, this.get('path'), value);
       }
-
-      Ember.Resource.deepSet(data, this.get('path'), value);
     },
 
     toJSON: function(instance) {
@@ -877,7 +898,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         }
       }
       return type;
-    }).cacheable()
+    })
   });
 
   Ember.Resource.HasManySchemaItem.reopenClass({
@@ -1087,6 +1108,9 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         });
 
         Ember.addListener(this, 'didFetch', this, function() {
+          if(!getPath(self, 'hasBeenFetched')) {
+            set(self, 'hasBeenFetched', true);
+          }
           set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
           updateExpiry();
         });
@@ -1114,15 +1138,18 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
       isInitializing: Ember.computed('resourceState', function (key, value) {
         return (getPath(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
-      }).cacheable(),
+      }),
 
       isFetching: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHING;
-      }).cacheable(),
+      }),
 
       isFetched: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
-      }).cacheable(),
+      }),
+
+
+      hasBeenFetched: false,
 
       isSavable: Ember.computed('resourceState', function(key, value) {
         var state = getPath(this, 'resourceState');
@@ -1134,11 +1161,11 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         ];
 
         return state && !unsavableState.contains(state);
-      }).cacheable(),
+      }),
 
       isSaving: Ember.computed('resourceState', function(key, value) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
-      }).cacheable(),
+      }),
 
       // Notify dependents on volatile properties
       resourceStateDidChange: function() {
@@ -1299,7 +1326,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     isNew: Ember.computed('id', function() {
       return !getPath(this, 'id');
-    }).cacheable(),
+    }),
 
     save: function(options) {
       options = options || {};
@@ -1680,6 +1707,12 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return items.map(function(item) {
         if (item instanceof this.type) {
           return item;
+        } else if(isString(item) && isFunction(this.type) && (this.type === String) ) {
+          return item;
+        } else if(isNumber(item) && isFunction(this.type) && (this.type === Number) ) {
+          return item;
+        } else if(isBoolean(item) && isFunction(this.type) && (this.type === Boolean) ) {
+          return item;
         } else {
           return this.type.create({}, item);
         }
@@ -1699,17 +1732,17 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       var content = getPath(this, 'content');
       var length = content ? getPath(content, 'length') : 0;
       return length;
-    }).cacheable(),
+    }),
 
     content: Ember.computed(function(name, value) {
       if (arguments.length === 2) { // setter
         return this.instantiateItems(value);
       }
-    }).cacheable(),
+    }),
 
     toJSON: function () {
       return this.map(function (item) {
-        return item.toJSON();
+        return (typeof item.toJSON !== 'undefined') ? item.toJSON() : item;
       });
     }
 
