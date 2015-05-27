@@ -80,9 +80,9 @@
   };
 
   Ember.Resource.AbstractSchemaItem = Ember.Object.extend({
-    name: Ember.required(String),
-    getValue: Ember.required(Function),
-    setValue: Ember.required(Function),
+    name: String,        // required
+    getValue: Function,  // required
+    setValue: Function,  // required
 
     dependencies: Ember.computed('path', function() {
       var deps = ['data.' + this.get('path')];
@@ -172,7 +172,7 @@
 
   Ember.Resource.AttributeSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
     theType: Object,
-    path: Ember.required(String),
+    path: String, // required
 
     getValue: function(instance) {
       var value;
@@ -1173,7 +1173,7 @@
 
   Ember.ResourceCollection = Ember.ArrayProxy.extend(Ember.Resource.RemoteExpiry, {
     isEmberResourceCollection: true,
-    type: Ember.required(),
+    type: null, // required
 
     fetched: function() {
       if (!this._fetchDfd) {
