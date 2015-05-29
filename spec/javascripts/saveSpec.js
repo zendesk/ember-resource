@@ -99,8 +99,7 @@ describe('Saving a resource instance', function() {
 
       it("should not allow setting the value of isSaving", function() {
         expect(resource.get('isSaving')).to.equal(false);
-        resource.set('isSaving', 'custom_value');
-        expect(resource.get('isSaving')).not.to.equal('custom_value');
+        expect(function() { resource.set('isSaving', 'custom_value'); }).to.throw(Error);
       });
     });
 

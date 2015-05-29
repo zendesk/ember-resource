@@ -80,9 +80,9 @@
   };
 
   Ember.Resource.AbstractSchemaItem = Ember.Object.extend({
-    name: Ember.required(String),
-    getValue: Ember.required(Function),
-    setValue: Ember.required(Function),
+    name: String,        // required
+    getValue: Function,  // required
+    setValue: Function,  // required
 
     dependencies: Ember.computed('path', function() {
       var deps = ['data.' + this.get('path')];
@@ -172,7 +172,7 @@
 
   Ember.Resource.AttributeSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
     theType: Object,
-    path: Ember.required(String),
+    path: String, // required
 
     getValue: function(instance) {
       var value;
@@ -665,27 +665,27 @@
         });
       },
 
-      isFetchable: Ember.computed(function(key, value) {
+      isFetchable: Ember.computed(function(key) {
         var state = getPath(this, 'resourceState');
         return state == Ember.Resource.Lifecycle.UNFETCHED || this.get('isExpired');
-      }).volatile(),
+      }).volatile().readOnly(),
 
-      isInitializing: Ember.computed('resourceState', function (key, value) {
+      isInitializing: Ember.computed('resourceState', function (key) {
         return (getPath(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
-      }),
+      }).readOnly(),
 
-      isFetching: Ember.computed('resourceState', function(key, value) {
+      isFetching: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHING;
-      }),
+      }).readOnly(),
 
-      isFetched: Ember.computed('resourceState', function(key, value) {
+      isFetched: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
-      }),
+      }).readOnly(),
 
 
       hasBeenFetched: false,
 
-      isSavable: Ember.computed('resourceState', function(key, value) {
+      isSavable: Ember.computed('resourceState', function(key) {
         var state = getPath(this, 'resourceState');
         var unsavableState = [
           Ember.Resource.Lifecycle.INITIALIZING,
@@ -695,11 +695,11 @@
         ];
 
         return state && !unsavableState.contains(state);
-      }),
+      }).readOnly(),
 
-      isSaving: Ember.computed('resourceState', function(key, value) {
+      isSaving: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
-      }),
+      }).readOnly(),
 
       // Notify dependents on volatile properties
       resourceStateDidChange: function() {
@@ -727,12 +727,12 @@
         return this.fetch();
       },
 
-      isExpired: Ember.computed(function(name, value) {
+      isExpired: Ember.computed(function(name) {
         var expireAt = this.get('expireAt');
         var now = new Date();
 
         return !!(expireAt && expireAt.getTime() <= now.getTime());
-      }).volatile(),
+      }).volatile().readOnly(),
 
       isFresh: function(data) {
         return true;
@@ -1173,7 +1173,7 @@
 
   Ember.ResourceCollection = Ember.ArrayProxy.extend(Ember.Resource.RemoteExpiry, {
     isEmberResourceCollection: true,
-    type: Ember.required(),
+    type: null, // required
 
     fetched: function() {
       if (!this._fetchDfd) {

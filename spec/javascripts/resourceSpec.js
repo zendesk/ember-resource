@@ -271,8 +271,7 @@ describe('A Resource instance', function () {
         'isInitializing',
         'isFetchable'
       ].forEach(function(state) {
-        model.set(state, 'custom_value');
-        expect(model.get(state)).not.to.equal('custom_value', 'fail message');
+        expect(function() { model.set(state, 'custom_value'); }).to.throw(Error);
       });
     });
   });
