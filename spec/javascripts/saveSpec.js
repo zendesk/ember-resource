@@ -91,10 +91,10 @@ describe('Saving a resource instance', function() {
       });
 
       it('should not allow concurrent saves', function() {
-        expect(resource.save()).to.be.ok;
-        expect(resource.save()).to.equal(false);
+        expect(resource.save().state()).to.equal('pending');
+        expect(resource.save().state()).to.equal('rejected');
         server.respond();
-        expect(resource.save()).to.be.ok;
+        expect(resource.save().state()).to.equal('pending');
       });
 
       it("should not allow setting the value of isSaving", function() {
