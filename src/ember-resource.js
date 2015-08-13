@@ -864,7 +864,9 @@
 
     save: function(options) {
       options = options || {};
-      if (!getPath(this, 'isSavable')) return false;
+      if (!getPath(this, 'isSavable')) {
+        return $.Deferred().reject(false);
+      }
 
       var ajaxOptions = {
         contentType: 'application/json',
