@@ -1,8 +1,15 @@
 /*globals Ember, LRUCache*/
 
 (function() {
-  Ember.Resource.IdentityMap = function(limit) {
+  Ember.Resource.IdentityMap = function(limit, evictionHandler) {
     this.cache = new LRUCache(limit || Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT);
+    this.evictionHandler = evictionHandler || function() {};
+    var map = this;
+    this.cache.shift = function() {
+      var entry = LRUCache.prototype.shift.call(this);
+      map.evictionHandler(entry);
+      return entry;
+    };
   };
 
   Ember.Resource.IdentityMap.prototype = {

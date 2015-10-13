@@ -618,7 +618,13 @@
         }
 
         return instance;
+      },
+
+      didEvictFromIdentityMap: function(entry) {
+        var fn = Em.Resource.identityMapEvictionHandler;
+        fn && fn.call(this, entry.value);
       }
+
     }),
 
     prototypeMixin: Ember.Mixin.create({
@@ -975,6 +981,7 @@
     return properties;
   };
 
+
   Ember.Resource.reopenClass({
     isEmberResource: true,
     schema: {},
@@ -1007,7 +1014,7 @@
 
         var id = data.id || options.id;
         if (id && !options.skipIdentityMap && this.useIdentityMap) {
-          this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit);
+          this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit, this.didEvictFromIdentityMap.bind(this));
 
           id = id.toString();
           instance = this.identityMap.get(id);
