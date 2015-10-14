@@ -4,9 +4,11 @@
   Ember.Resource.IdentityMap = function(limit, evictionHandler) {
     this.cache = new LRUCache(limit || Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT);
     this.evictionHandler = evictionHandler || function() {};
-    var map = this;
+    var map = this,
+        origShift = this.cache.shift;
+
     this.cache.shift = function() {
-      var entry = LRUCache.prototype.shift.call(this);
+      var entry = origShift.apply(this, arguments);
       map.evictionHandler(entry);
       return entry;
     };
