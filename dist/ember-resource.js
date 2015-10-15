@@ -367,8 +367,17 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 /*globals Ember, LRUCache*/
 
 (function() {
-  Ember.Resource.IdentityMap = function(limit) {
+  Ember.Resource.IdentityMap = function(limit, evictionHandler) {
     this.cache = new LRUCache(limit || Ember.Resource.IdentityMap.DEFAULT_IDENTITY_MAP_LIMIT);
+    this.evictionHandler = evictionHandler || function() {};
+    var map = this,
+        origShift = this.cache.shift;
+
+    this.cache.shift = function() {
+      var entry = origShift.apply(this, arguments);
+      map.evictionHandler(entry);
+      return entry;
+    };
   };
 
   Ember.Resource.IdentityMap.prototype = {
@@ -546,9 +555,9 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
   };
 
   Ember.Resource.AbstractSchemaItem = Ember.Object.extend({
-    name: Ember.required(String),
-    getValue: Ember.required(Function),
-    setValue: Ember.required(Function),
+    name: String,        // required
+    getValue: Function,  // required
+    setValue: Function,  // required
 
     dependencies: Ember.computed('path', function() {
       var deps = ['data.' + this.get('path')];
@@ -638,7 +647,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
   Ember.Resource.AttributeSchemaItem = Ember.Resource.AbstractSchemaItem.extend({
     theType: Object,
-    path: Ember.required(String),
+    path: String, // required
 
     getValue: function(instance) {
       var value;
@@ -1084,7 +1093,13 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         }
 
         return instance;
+      },
+
+      didEvictFromIdentityMap: function(entry) {
+        var fn = Em.Resource.identityMapEvictionHandler;
+        fn && fn.call(this, entry.value);
       }
+
     }),
 
     prototypeMixin: Ember.Mixin.create({
@@ -1131,27 +1146,27 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         });
       },
 
-      isFetchable: Ember.computed(function(key, value) {
+      isFetchable: Ember.computed(function(key) {
         var state = getPath(this, 'resourceState');
         return state == Ember.Resource.Lifecycle.UNFETCHED || this.get('isExpired');
-      }).volatile(),
+      }).volatile().readOnly(),
 
-      isInitializing: Ember.computed('resourceState', function (key, value) {
+      isInitializing: Ember.computed('resourceState', function (key) {
         return (getPath(this, 'resourceState') || Ember.Resource.Lifecycle.INITIALIZING) === Ember.Resource.Lifecycle.INITIALIZING;
-      }),
+      }).readOnly(),
 
-      isFetching: Ember.computed('resourceState', function(key, value) {
+      isFetching: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHING;
-      }),
+      }).readOnly(),
 
-      isFetched: Ember.computed('resourceState', function(key, value) {
+      isFetched: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.FETCHED;
-      }),
+      }).readOnly(),
 
 
       hasBeenFetched: false,
 
-      isSavable: Ember.computed('resourceState', function(key, value) {
+      isSavable: Ember.computed('resourceState', function(key) {
         var state = getPath(this, 'resourceState');
         var unsavableState = [
           Ember.Resource.Lifecycle.INITIALIZING,
@@ -1161,11 +1176,11 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         ];
 
         return state && !unsavableState.contains(state);
-      }),
+      }).readOnly(),
 
-      isSaving: Ember.computed('resourceState', function(key, value) {
+      isSaving: Ember.computed('resourceState', function(key) {
         return (getPath(this, 'resourceState')) === Ember.Resource.Lifecycle.SAVING;
-      }),
+      }).readOnly(),
 
       // Notify dependents on volatile properties
       resourceStateDidChange: function() {
@@ -1193,12 +1208,12 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         return this.fetch();
       },
 
-      isExpired: Ember.computed(function(name, value) {
+      isExpired: Ember.computed(function(name) {
         var expireAt = this.get('expireAt');
         var now = new Date();
 
         return !!(expireAt && expireAt.getTime() <= now.getTime());
-      }).volatile(),
+      }).volatile().readOnly(),
 
       isFresh: function(data) {
         return true;
@@ -1330,7 +1345,9 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     save: function(options) {
       options = options || {};
-      if (!getPath(this, 'isSavable')) return false;
+      if (!getPath(this, 'isSavable')) {
+        return $.Deferred().reject(false);
+      }
 
       var ajaxOptions = {
         contentType: 'application/json',
@@ -1439,6 +1456,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
     return properties;
   };
 
+
   Ember.Resource.reopenClass({
     isEmberResource: true,
     schema: {},
@@ -1471,7 +1489,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
         var id = data.id || options.id;
         if (id && !options.skipIdentityMap && this.useIdentityMap) {
-          this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit);
+          this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit, this.didEvictFromIdentityMap.bind(this));
 
           id = id.toString();
           instance = this.identityMap.get(id);
@@ -1639,7 +1657,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
   Ember.ResourceCollection = Ember.ArrayProxy.extend(Ember.Resource.RemoteExpiry, {
     isEmberResourceCollection: true,
-    type: Ember.required(),
+    type: null, // required
 
     fetched: function() {
       if (!this._fetchDfd) {

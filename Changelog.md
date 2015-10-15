@@ -1,3 +1,8 @@
+## 2.1.0 -- 2015-15-10
+* Adds a handler for LRU evictions (#109)
+* Ember.Resource.save() should always return a promise (#108)
+* Fixed Ember 1.12 deprecation warnings (#105)
+
 ## 2.1.0 -- 2015-05-08
 
 * Adds a hasBeenFetched property to resources and collections
