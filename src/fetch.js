@@ -38,7 +38,7 @@
 
     var dfd = $.Deferred();
 
-    $.ajax(options).done(function() {
+    var ajax = $.ajax(options).done(function() {
       var args = slice.apply(arguments);
       Em.run(function() {
         dfd.resolveWith(options.context, args);
@@ -50,7 +50,9 @@
       });
     });
 
-    return dfd.promise();
+    return $.extend({
+      abort: ajax.abort
+    }, dfd.promise());
   };
 
 
