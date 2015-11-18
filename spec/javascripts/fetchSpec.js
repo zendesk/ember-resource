@@ -237,5 +237,21 @@ describe('deferred fetch', function() {
       var request = Em.Resource.cancelableAjax('/autocomplete');
       expect(request.abort).to.be.defined;
     });
+
+    describe('using the returned promise', function() {
+      var spy, cb;
+
+      beforeEach(function() {
+        spy = sinon.spy();
+        cb = $.noop;
+        spy(cb);
+      });
+
+      it('calls the done callback', function() {
+        Em.Resource.cancelableAjax('/autocomplete').promise.done(cb);
+        server.respond();
+        expect(spy.called);
+      });
+    });
   });
 });
