@@ -23,6 +23,10 @@
   var slice = Array.prototype.slice;
 
   exports.Ember.Resource.ajax = function(options) {
+    return Em.Resource.cancelableAjax(options).promise;
+  };
+
+  exports.Ember.Resource.cancelableAjax = function(options) {
     if (typeof options === "string") {
       options = { url: '' + options };
     }
@@ -38,7 +42,7 @@
 
     var dfd = $.Deferred();
 
-    $.ajax(options).done(function() {
+    var ajax = $.ajax(options).done(function() {
       var args = slice.apply(arguments);
       Em.run(function() {
         dfd.resolveWith(options.context, args);
@@ -50,7 +54,10 @@
       });
     });
 
-    return dfd.promise();
+    return {
+      abort:   ajax.abort,
+      promise: dfd.promise()
+    };
   };
 
 
