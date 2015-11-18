@@ -223,4 +223,19 @@ describe('deferred fetch', function() {
     });
   });
 
+  describe('#cancelableAjax', function() {
+    beforeEach(function() {
+      server.respondWith('GET', '/autocomplete', [200, { "Content-Type": "application/json" }, '[]']);
+    });
+
+    it('returned object should contain a promise', function() {
+      var request = Em.Resource.cancelableAjax('/autocomplete');
+      expect(request.promise).to.be.defined;
+    });
+
+    it('returned object should contain an abort function', function() {
+      var request = Em.Resource.cancelableAjax('/autocomplete');
+      expect(request.abort).to.be.defined;
+    });
+  });
 });
