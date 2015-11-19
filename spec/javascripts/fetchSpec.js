@@ -223,4 +223,41 @@ describe('deferred fetch', function() {
     });
   });
 
+  describe('#cancelableAjax', function() {
+    beforeEach(function() {
+      server.respondWith('GET', '/autocomplete', [200, { "Content-Type": "application/json" }, '[]']);
+    });
+
+    it('returned object should contain a promise', function() {
+      var request = Em.Resource.cancelableAjax('/autocomplete');
+      expect(request.promise).to.be.defined;
+    });
+
+    it('returned object should contain an abort function', function() {
+      var request = Em.Resource.cancelableAjax('/autocomplete');
+      expect(request.abort).to.be.defined;
+    });
+
+    describe('using the returned promise and abort', function() {
+      var spy, request;
+
+      beforeEach(function() {
+        spy = sinon.spy();
+        request = Em.Resource.cancelableAjax('/autocomplete');
+      });
+
+      it('calls the done callback', function() {
+        request.promise.done(spy);
+        server.respond();
+        expect(spy.called).to.be.true;
+      });
+
+      it('does not call the done callback when aborted', function() {
+        request.promise.done(spy);
+        request.abort();
+        server.respond();
+        expect(spy.called).to.be.false;
+      });
+    });
+  });
 });
