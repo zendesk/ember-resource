@@ -249,14 +249,14 @@ describe('deferred fetch', function() {
       it('calls the done callback', function() {
         request.promise.done(spy);
         server.respond();
-        expect(spy.called).to.be.true
+        expect(spy.called).to.be.true;
       });
 
       it('does not call the done callback when aborted', function() {
         request.promise.done(spy);
         request.abort();
         server.respond();
-        expect(spy.called).to.be.false
+        expect(spy.called).to.be.false;
       });
     });
   });
