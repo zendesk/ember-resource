@@ -1,4 +1,4 @@
-## 2.1.1 -- 2015-23-11
+## 2.3.0 -- 2015-23-11
 * Add Support for `abortCallback` Option in Em.Resource.ajax (#113)
 
 ## 2.1.0 -- 2015-15-10
