@@ -50,9 +50,11 @@
       });
     });
 
-    return $.extend({
-      abort: ajax.abort
-    }, dfd.promise());
+    if (options.abortCallback) {
+      options.abortCallback(ajax.abort.bind(ajax));
+    }
+
+    return dfd.promise();
   };
 
 
