@@ -224,7 +224,7 @@ describe('deferred fetch', function() {
   });
 
   describe('#ajax', function() {
-    var spy, request;
+    var abort, done, request;
 
     beforeEach(function() {
       server.respondWith('GET', '/autocomplete', [200, { "Content-Type": "application/json" }, '[]']);
@@ -232,16 +232,41 @@ describe('deferred fetch', function() {
 
     describe('using the abortCallback option', function() {
       beforeEach(function() {
-        spy = sinon.spy();
+        abort = sinon.spy();
+        done  = sinon.spy();
       });
 
       it('should call the abortCallback option with an ajax abort function', function() {
         request = Em.Resource.ajax({
           url: '/autocomplete',
-          abortCallback: spy
+          abortCallback: abort
         });
 
-        expect(spy.called).to.be.true;
+        expect(abort.called).to.be.true;
+      });
+
+      it('should call the done callback when not aborted', function() {
+        request = Em.Resource.ajax({
+          url: '/autocomplete',
+          abortCallback: abort
+        });
+
+        request.done(done);
+        server.respond();
+        expect(done.called).to.be.true;
+      });
+
+      it('should not call the done callback when abort is called', function() {
+        request = Em.Resource.ajax({
+          url: '/autocomplete',
+          abortCallback: function(abort) {
+            abort();
+          }
+        });
+
+        request.done(done);
+        server.respond();
+        expect(done.called).to.be.false;
       });
     });
   });
