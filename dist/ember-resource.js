@@ -451,7 +451,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     var dfd = $.Deferred();
 
-    var ajax = $.ajax(options).done(function() {
+    $.ajax(options).done(function() {
       var args = slice.apply(arguments);
       Em.run(function() {
         dfd.resolveWith(options.context, args);
@@ -462,10 +462,6 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         dfd.rejectWith(options.context, args);
       });
     });
-
-    if (options.abortCallback) {
-      options.abortCallback(ajax.abort.bind(ajax));
-    }
 
     return dfd.promise();
   };
