@@ -223,4 +223,26 @@ describe('deferred fetch', function() {
     });
   });
 
+  describe('#ajax', function() {
+    var spy, request;
+
+    beforeEach(function() {
+      server.respondWith('GET', '/autocomplete', [200, { "Content-Type": "application/json" }, '[]']);
+    });
+
+    describe('using the abortCallback option', function() {
+      beforeEach(function() {
+        spy = sinon.spy();
+      });
+
+      it('should call the abortCallback option with an ajax abort function', function() {
+        request = Em.Resource.ajax({
+          url: '/autocomplete',
+          abortCallback: spy
+        });
+
+        expect(spy.called).to.be.true;
+      });
+    });
+  });
 });
