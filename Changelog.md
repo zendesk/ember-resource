@@ -1,3 +1,6 @@
+## 2.3.0 -- 2015-23-11
+* Add Support for `abortCallback` Option in Em.Resource.ajax (#113)
+
 ## 2.1.0 -- 2015-15-10
 * Adds a handler for LRU evictions (#109)
 * Ember.Resource.save() should always return a promise (#108)
