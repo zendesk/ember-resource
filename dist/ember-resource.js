@@ -1298,6 +1298,12 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
       Ember.Resource.fetch(this, ajaxOptions)
         .done(function(json) {
+          if (self.get('isDestroying') || self.get('isDestroyed')) {
+            Ember.Resource.sendEvent(self, 'didFail');
+            result.reject();
+            self.fetched().reject();
+            return;
+          }
           self.updateWithApiData(json);
           self.didFetch.call(self);
           Ember.Resource.sendEvent(self, 'didFetch');
