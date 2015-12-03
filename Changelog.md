@@ -1,3 +1,6 @@
+## 2.3.1 -- 2015-12-02
+* Fix a bug where an Ember assertion is failed if an object is destroyed or marked for destruction after a call to fetch but before the fetch completes.
+
 ## 2.3.0 -- 2015-23-11
 * Add Support for `abortCallback` Option in Em.Resource.ajax (#113)
 
