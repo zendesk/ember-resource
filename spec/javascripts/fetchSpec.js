@@ -185,6 +185,20 @@ describe('deferred fetch', function() {
 
     });
 
+    describe('when the resource is destroyed before the response', function() {
+      it('should call the fail handler', function() {
+        var spy = sinon.spy();
+
+        person.fetch().fail(function() {
+          spy();
+        });
+        person.destroy();
+        server.respond();
+
+        expect(spy.called).to.equal(true);
+      });
+    });
+
     describe('when there are errors', function() {
       beforeEach(function() {
         server.respondWith('GET', '/people', [422, {}, '[["foo", "bar"]]']);
