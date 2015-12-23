@@ -107,17 +107,19 @@
       return type;
     }),
 
-    propertyFunction: function(name, value) {
-      var schemaItem = this.constructor.schema[name];
-      if (arguments.length > 1) {
+    propertyFunction: {
+      get: function(name) {
+        var schemaItem = this.constructor.schema[name];
+        return schemaItem.getValue.call(schemaItem, this);
+      },
+      set: function(name, value) {
+        var schemaItem = this.constructor.schema[name];
         this.resourcePropertyWillChange(name, value);
         schemaItem.setValue.call(schemaItem, this, value);
         value = schemaItem.getValue.call(schemaItem, this);
         this.resourcePropertyDidChange(name, value);
-      } else {
-        value = schemaItem.getValue.call(schemaItem, this);
+        return value;
       }
-      return value;
     },
 
     property: function() {
@@ -1289,8 +1291,9 @@
       return length;
     }),
 
-    content: Ember.computed(function(name, value) {
-      if (arguments.length === 2) { // setter
+    content: Ember.computed({
+      get: function() {},
+      set: function(name, value) {
         return this.instantiateItems(value);
       }
     }),
