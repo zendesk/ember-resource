@@ -486,6 +486,14 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       getPath = Ember.Resource.getPath,
       set = Ember.set;
 
+  // Determine if we need to be back compatible with Ember < 1.12
+  var requiresEmberComputedPropertyFunction = false;
+  try {
+    Ember.computed({get: function() {}, set: function(key, value) {}});
+  } catch(ex) {
+    requiresEmberComputedPropertyFunction = true;
+  }
+
   function isString(obj) {
     return Ember.typeOf(obj) === 'string';
   }
@@ -599,8 +607,32 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return value;
     },
 
+    propertyFunctions: {
+      get: function(name) {
+        var schemaItem = this.constructor.schema[name];
+        return schemaItem.getValue.call(schemaItem, this);
+      },
+
+      set: function(name, value) {
+        var schemaItem = this.constructor.schema[name];
+
+        this.resourcePropertyWillChange(name, value);
+        schemaItem.setValue.call(schemaItem, this, value);
+        value = schemaItem.getValue.call(schemaItem, this);
+        this.resourcePropertyDidChange(name, value);
+
+        return value;
+      }
+    },
+
     property: function() {
-      var cp = new Ember.ComputedProperty(this.propertyFunction);
+      var cp;
+
+      if (requiresEmberComputedPropertyFunction) {
+        cp = new Ember.ComputedProperty(this.propertyFunction);
+      } else {
+        cp = new Ember.ComputedProperty(this.propertyFunctions);
+      }
       return cp.property.apply(cp, this.get('dependencies'));
     },
 
@@ -608,6 +640,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return undefined;
     }
   });
+
   Ember.Resource.AbstractSchemaItem.reopenClass({
     create: function(name, schema) {
       var createWithMixins = this.superclass.createWithMixins || this._super;
@@ -1768,11 +1801,21 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return length;
     }),
 
-    content: Ember.computed(function(name, value) {
-      if (arguments.length === 2) { // setter
-        return this.instantiateItems(value);
-      }
-    }),
+    content: requiresEmberComputedPropertyFunction ?
+      Ember.computed(function(name, value) {
+        if (arguments.length === 2) { // setter
+          return this.instantiateItems(value);
+        }
+      }) :
+      Ember.computed( {
+        set: function(name, value) {
+          return this.instantiateItems(value);
+        },
+
+        get: function() {
+          return;
+        }
+      }),
 
     toJSON: function () {
       return this.map(function (item) {
