@@ -594,45 +594,39 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return type;
     }),
 
-    propertyFunction: function(name, value) {
-      var schemaItem = this.constructor.schema[name];
-      if (arguments.length > 1) {
-        this.resourcePropertyWillChange(name, value);
-        schemaItem.setValue.call(schemaItem, this, value);
-        value = schemaItem.getValue.call(schemaItem, this);
-        this.resourcePropertyDidChange(name, value);
-      } else {
-        value = schemaItem.getValue.call(schemaItem, this);
-      }
-      return value;
-    },
-
-    propertyFunctions: {
-      get: function(name) {
+    propertyFunction: requiresEmberComputedPropertyFunction ?
+      function(name, value) {
         var schemaItem = this.constructor.schema[name];
-        return schemaItem.getValue.call(schemaItem, this);
+        if (arguments.length > 1) {
+          this.resourcePropertyWillChange(name, value);
+          schemaItem.setValue.call(schemaItem, this, value);
+          value = schemaItem.getValue.call(schemaItem, this);
+          this.resourcePropertyDidChange(name, value);
+        } else {
+          value = schemaItem.getValue.call(schemaItem, this);
+        }
+        return value;
+      } :
+      {
+        get: function(name) {
+          var schemaItem = this.constructor.schema[name];
+          return schemaItem.getValue.call(schemaItem, this);
+        },
+
+        set: function(name, value) {
+          var schemaItem = this.constructor.schema[name];
+
+          this.resourcePropertyWillChange(name, value);
+          schemaItem.setValue.call(schemaItem, this, value);
+          value = schemaItem.getValue.call(schemaItem, this);
+          this.resourcePropertyDidChange(name, value);
+
+          return value;
+        }
       },
 
-      set: function(name, value) {
-        var schemaItem = this.constructor.schema[name];
-
-        this.resourcePropertyWillChange(name, value);
-        schemaItem.setValue.call(schemaItem, this, value);
-        value = schemaItem.getValue.call(schemaItem, this);
-        this.resourcePropertyDidChange(name, value);
-
-        return value;
-      }
-    },
-
     property: function() {
-      var cp;
-
-      if (requiresEmberComputedPropertyFunction) {
-        cp = new Ember.ComputedProperty(this.propertyFunction);
-      } else {
-        cp = new Ember.ComputedProperty(this.propertyFunctions);
-      }
+      var cp = new Ember.ComputedProperty(this.propertyFunction);
       return cp.property.apply(cp, this.get('dependencies'));
     },
 
