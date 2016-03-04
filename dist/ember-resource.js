@@ -486,6 +486,14 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       getPath = Ember.Resource.getPath,
       set = Ember.set;
 
+  // Determine if we need to be back compatible with Ember < 1.12
+  var requiresEmberComputedPropertyFunction = false;
+  try {
+    Ember.computed({get: function() {}, set: function(key, value) {}});
+  } catch(ex) {
+    requiresEmberComputedPropertyFunction = true;
+  }
+
   function isString(obj) {
     return Ember.typeOf(obj) === 'string';
   }
@@ -586,18 +594,35 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return type;
     }),
 
-    propertyFunction: function(name, value) {
-      var schemaItem = this.constructor.schema[name];
-      if (arguments.length > 1) {
-        this.resourcePropertyWillChange(name, value);
-        schemaItem.setValue.call(schemaItem, this, value);
-        value = schemaItem.getValue.call(schemaItem, this);
-        this.resourcePropertyDidChange(name, value);
-      } else {
-        value = schemaItem.getValue.call(schemaItem, this);
-      }
-      return value;
-    },
+    propertyFunction: (function(){
+      var _get =  function(name) {
+                    var schemaItem = this.constructor.schema[name];
+
+                    return schemaItem.getValue.call(schemaItem, this);
+                  },
+          _set = function(name, value) {
+                    var schemaItem = this.constructor.schema[name];
+
+                    this.resourcePropertyWillChange(name, value);
+                    schemaItem.setValue.call(schemaItem, this, value);
+                    value = schemaItem.getValue.call(schemaItem, this);
+                    this.resourcePropertyDidChange(name, value);
+
+                    return value;
+                };
+
+      return requiresEmberComputedPropertyFunction ?
+        function(name, value) {
+          if (arguments.length > 1) {
+            return _set.apply(this, arguments);
+          } else {
+            return _get.apply(this, arguments);
+          }
+        } : {
+          get: _get,
+          set: _set
+        };
+    })(),
 
     property: function() {
       var cp = new Ember.ComputedProperty(this.propertyFunction);
@@ -608,6 +633,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return undefined;
     }
   });
+
   Ember.Resource.AbstractSchemaItem.reopenClass({
     create: function(name, schema) {
       var createWithMixins = this.superclass.createWithMixins || this._super;
@@ -1768,11 +1794,21 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       return length;
     }),
 
-    content: Ember.computed(function(name, value) {
-      if (arguments.length === 2) { // setter
-        return this.instantiateItems(value);
-      }
-    }),
+    content: requiresEmberComputedPropertyFunction ?
+      Ember.computed(function(name, value) {
+        if (arguments.length === 2) { // setter
+          return this.instantiateItems(value);
+        }
+      }) :
+      Ember.computed( {
+        set: function(name, value) {
+          return this.instantiateItems(value);
+        },
+
+        get: function() {
+          return;
+        }
+      }),
 
     toJSON: function () {
       return this.map(function (item) {

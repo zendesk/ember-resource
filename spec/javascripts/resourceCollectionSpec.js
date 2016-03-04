@@ -16,7 +16,7 @@ describe('ResourceCollection', function() {
 
       url: function() {
         return '/url/from/collection';
-      }.property().cacheable()
+      }.property()
     }).create();
 
     expect(collection.resolveUrl()).to.equal('/url/from/collection');
@@ -96,7 +96,7 @@ describe('ResourceCollection', function() {
 
         url: function() {
           return '/people';
-        }.property().cacheable(),
+        }.property(),
 
         isFresh: isFresh
 
@@ -146,7 +146,7 @@ describe('ResourceCollection', function() {
         type: String,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create();
 
       collection.fetch();
@@ -162,7 +162,7 @@ describe('ResourceCollection', function() {
         type: String,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create({ content: [] });
 
       collection.pushObject("en_US");
@@ -181,7 +181,7 @@ describe('ResourceCollection', function() {
         type: Number,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create();
 
       collection.fetch();
@@ -197,7 +197,7 @@ describe('ResourceCollection', function() {
         type: String,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create({ content: [] });
 
       collection.pushObject(1);
@@ -215,7 +215,7 @@ describe('ResourceCollection', function() {
         type: Boolean,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create();
 
       collection.fetch();
@@ -231,7 +231,7 @@ describe('ResourceCollection', function() {
         type: String,
         url: function() {
           return '/localizations';
-        }.property().cacheable()
+        }.property()
       }).create({ content: [] });
 
       collection.pushObject(true);
