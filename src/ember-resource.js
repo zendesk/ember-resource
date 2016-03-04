@@ -115,36 +115,35 @@
       return type;
     }),
 
-    propertyFunction: requiresEmberComputedPropertyFunction ?
-      function(name, value) {
-        var schemaItem = this.constructor.schema[name];
-        if (arguments.length > 1) {
-          this.resourcePropertyWillChange(name, value);
-          schemaItem.setValue.call(schemaItem, this, value);
-          value = schemaItem.getValue.call(schemaItem, this);
-          this.resourcePropertyDidChange(name, value);
-        } else {
-          value = schemaItem.getValue.call(schemaItem, this);
-        }
-        return value;
-      } :
-      {
-        get: function(name) {
-          var schemaItem = this.constructor.schema[name];
-          return schemaItem.getValue.call(schemaItem, this);
-        },
+    propertyFunction: (function(){
+      var _get =  function(name) {
+                    var schemaItem = this.constructor.schema[name];
 
-        set: function(name, value) {
-          var schemaItem = this.constructor.schema[name];
+                    return schemaItem.getValue.call(schemaItem, this);
+                  },
+          _set = function(name, value) {
+                    var schemaItem = this.constructor.schema[name];
 
-          this.resourcePropertyWillChange(name, value);
-          schemaItem.setValue.call(schemaItem, this, value);
-          value = schemaItem.getValue.call(schemaItem, this);
-          this.resourcePropertyDidChange(name, value);
+                    this.resourcePropertyWillChange(name, value);
+                    schemaItem.setValue.call(schemaItem, this, value);
+                    value = schemaItem.getValue.call(schemaItem, this);
+                    this.resourcePropertyDidChange(name, value);
 
-          return value;
-        }
-      },
+                    return value;
+                };
+
+      return requiresEmberComputedPropertyFunction ?
+        function(name, value) {
+          if (arguments.length > 1) {
+            return _set.apply(this, arguments);
+          } else {
+            return _get.apply(this, arguments);
+          }
+        } : {
+          get: _get,
+          set: _set
+        };
+    })(),
 
     property: function() {
       var cp = new Ember.ComputedProperty(this.propertyFunction);
