@@ -13,7 +13,7 @@ Notable `2.0` features:
 * The Ember Resource Clock is not enabled by default -- this has been known to cause performance problems in large applications.
 * Ember Resource `2.0` has `Ember 1.x` support.
 
-## The Mandatory Todo Appplication
+## The Mandatory Todo Application
 
 I've created a modified version of the todo application that the Ember.js Tutorial walks you through.
 https://github.com/staugaard/sproutcore-resource-todos
