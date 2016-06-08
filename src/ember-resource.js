@@ -157,11 +157,7 @@
 
   Ember.Resource.AbstractSchemaItem.reopenClass({
     create: function(name, schema) {
-      var createWithMixins = this.superclass.createWithMixins || this._super;
-
-      var instance = createWithMixins.apply(this);
-      instance.set('name', name);
-      return instance;
+      return this._super({name: name});
     }
   });
 
@@ -1042,8 +1038,6 @@
       if (klass === this) {
         var instance;
 
-        var createWithMixins = this.superclass.createWithMixins || this._super;
-
         var id = data.id || options.id;
         if (id && !options.skipIdentityMap && this.useIdentityMap) {
           this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit, this.didEvictFromIdentityMap.bind(this));
@@ -1052,7 +1046,7 @@
           instance = this.identityMap.get(id);
 
           if (!instance) {
-            instance = createWithMixins.call(this, { data: data });
+            instance = this._super({ data: data });
             this.identityMap.put(id, instance);
           } else {
             instance.updateWithApiData(data);
@@ -1061,7 +1055,7 @@
             delete options.id;
           }
         } else {
-          instance = createWithMixins.call(this, { data: data });
+          instance = this._super({ data: data });
         }
 
         delete options.data;
@@ -1357,17 +1351,15 @@
 
       var instance;
 
-      var createWithMixins = this.superclass.createWithMixins || this._super;
-
       if (!options.prePopulated && options.url && this.useIdentityMap) {
         this.identityMap = this.identityMap || new Ember.Resource.IdentityMap(this.identityMapLimit);
         options.id = options.id || makeId(options.type, options.url);
-        instance = this.identityMap.get(options.id) || createWithMixins.call(this, options);
+        instance = this.identityMap.get(options.id) || Em.ArrayProxy.create.call(this.extend(options), {constructor: this});
         this.identityMap.put(options.id, instance);
       }
 
       if (!instance) {
-        instance = createWithMixins.call(this, options);
+        instance = Em.ArrayProxy.create.call(this.extend(options), {constructor: this});
 
         if (content) {
           set(instance, 'content', instance.parse(content));
