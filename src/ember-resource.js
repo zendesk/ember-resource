@@ -37,7 +37,7 @@
 
   // Used when evaluating schemas to turn a type String into a class.
   Ember.Resource.lookUpType = function(string) {
-    return getPath(string);
+    return getPath(exports, string);
   };
 
   Ember.Resource.deepSet = function(obj, path, value) {
