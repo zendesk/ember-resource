@@ -166,7 +166,6 @@ describe('Saving a resource instance', function() {
 
   });
 
-
   describe('updating from response', function() {
     var resource;
 
@@ -254,5 +253,22 @@ describe('Saving a resource instance', function() {
       });
     });
 
+  });
+
+  describe('payload for save requests', function() {
+    var resource;
+    beforeEach(function() {
+      resource = Model.create({ name: 'foo', id: 12, subject: 'hello world!' });
+    });
+
+    it('saves requested fields when specified', function() {
+      resource.save({fields: ['name', 'id']});
+      expect(server.requests[0].requestBody).to.equal('{"id":12,"name":"foo"}');
+    });
+
+    it('saves all fields', function() {
+      resource.save();
+      expect(server.requests[0].requestBody).to.equal('{"id":12,"name":"foo","subject":"hello world!"}');
+    });
   });
 });

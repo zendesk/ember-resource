@@ -873,22 +873,23 @@
 
     // Turn this resource into a JSON object to be saved via AJAX. Override
     // this method to produce different syncing behavior.
-    toJSON: function() {
+    toJSON: function(fields) {
       var json = {};
       var schemaItem, path, value;
-      for (var name in this.constructor.schema) {
-        if (this.constructor.schema.hasOwnProperty(name)) {
-          schemaItem = this.constructor.schema[name];
-          if (schemaItem instanceof Ember.Resource.AbstractSchemaItem) {
-            path = schemaItem.get('path');
-            value = schemaItem.toJSON(this);
-            if (value !== undefined) {
-              Ember.Resource.deepSet(json, path, value);
-            }
+      var schemaFields = Object.keys(this.constructor.schema);
+      var fieldsToSet = fields ? schemaFields.filter(function(schemaField) {
+        return fields.indexOf(schemaField) !== -1;
+      }) : schemaFields;
+      fieldsToSet.forEach(function(name) {
+        schemaItem = this.constructor.schema[name];
+        if (schemaItem instanceof Ember.Resource.AbstractSchemaItem) {
+          path = schemaItem.get('path');
+          value = schemaItem.toJSON(this);
+          if (value !== undefined) {
+            Ember.Resource.deepSet(json, path, value);
           }
         }
-      }
-
+      }, this);
       return json;
     },
 
@@ -904,7 +905,7 @@
 
       var ajaxOptions = {
         contentType: 'application/json',
-        data: JSON.stringify(this.toJSON()),
+        data: JSON.stringify(this.toJSON(options.fields)),
         resource: this
       };
 
