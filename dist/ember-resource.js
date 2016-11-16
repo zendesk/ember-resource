@@ -1356,8 +1356,8 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       var json = {};
       var schemaItem, path, value;
       var schemaFields = Object.keys(this.constructor.schema);
-      var fieldsToSet = fields ? schemaFields.filter(function(schemaField) {
-        return fields.indexOf(schemaField) !== -1;
+      var fieldsToSet = fields ? fields.filter(function(schemaField) {
+        return schemaFields.indexOf(schemaField) !== -1;
       }) : schemaFields;
       fieldsToSet.forEach(function(name) {
         schemaItem = this.constructor.schema[name];

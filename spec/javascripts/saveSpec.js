@@ -263,7 +263,7 @@ describe('Saving a resource instance', function() {
 
     it('saves requested fields when specified', function() {
       resource.save({fields: ['name', 'id']});
-      expect(server.requests[0].requestBody).to.equal('{"id":12,"name":"foo"}');
+      expect(server.requests[0].requestBody).to.equal('{"name":"foo","id":12}');
     });
 
     it('saves all fields', function() {
