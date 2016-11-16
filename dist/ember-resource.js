@@ -1352,22 +1352,23 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     // Turn this resource into a JSON object to be saved via AJAX. Override
     // this method to produce different syncing behavior.
-    toJSON: function() {
+    toJSON: function(fields) {
       var json = {};
       var schemaItem, path, value;
-      for (var name in this.constructor.schema) {
-        if (this.constructor.schema.hasOwnProperty(name)) {
-          schemaItem = this.constructor.schema[name];
-          if (schemaItem instanceof Ember.Resource.AbstractSchemaItem) {
-            path = schemaItem.get('path');
-            value = schemaItem.toJSON(this);
-            if (value !== undefined) {
-              Ember.Resource.deepSet(json, path, value);
-            }
+      var schemaFields = Object.keys(this.constructor.schema);
+      var fieldsToSet = fields ? fields.filter(function(schemaField) {
+        return schemaFields.indexOf(schemaField) !== -1;
+      }) : schemaFields;
+      fieldsToSet.forEach(function(name) {
+        schemaItem = this.constructor.schema[name];
+        if (schemaItem instanceof Ember.Resource.AbstractSchemaItem) {
+          path = schemaItem.get('path');
+          value = schemaItem.toJSON(this);
+          if (value !== undefined) {
+            Ember.Resource.deepSet(json, path, value);
           }
         }
-      }
-
+      }, this);
       return json;
     },
 
@@ -1383,7 +1384,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
       var ajaxOptions = {
         contentType: 'application/json',
-        data: JSON.stringify(this.toJSON()),
+        data: JSON.stringify(this.toJSON(options.fields)),
         resource: this
       };
 
