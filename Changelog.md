@@ -1,3 +1,11 @@
+## 2.3.3 -- 2016-11-17
+
+* Allow specifying specific fields to be sent over the network when saving a resource (#120)
+
+## 2.3.2 -- 2016-03-05
+
+* Add support for Ember 1.13+ (#117)
+
 ## 2.3.1 -- 2015-12-02
 * Fix a bug where an Ember assertion is failed if an object is destroyed or marked for destruction after a call to fetch but before the fetch completes.
 

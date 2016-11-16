@@ -2,7 +2,7 @@
 
 A simple library to connect your Ember.js application to JSON backends.
 
-* Current stable version: `2.0`
+* Current stable version: `2.3.3`
 * Download: \[[Development version][1]] \[[Minified version][2]]
 * CDN: `//cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.0.0/ember-resource.min.js`
 
