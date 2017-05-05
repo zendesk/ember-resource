@@ -1,8 +1,12 @@
 {
-  "name": "ember-resource",
+  "name": "@zendesk/ember-resource",
   "version": "2.3.3",
   "licence": "APLv2",
   "description": "A simple library to connect your Ember.js application to JSON backends.",
+  "publishConfig":{
+    "registry":"https://zdrepo.jfrog.io/zdrepo/api/npm/npm"
+  },
+  "private": true,
   "keywords": [
     "ember",
     "json",
