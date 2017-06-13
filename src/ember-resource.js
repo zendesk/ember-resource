@@ -788,10 +788,14 @@
 
       if(!this.isFresh(parsedData)) { return; }
 
-      Ember.beginPropertyChanges(data);
-      Ember.Resource.deepMerge(data, parsedData);
-      Ember.endPropertyChanges(data);
-
+      Ember.beginPropertyChanges();
+      try {
+        Ember.Resource.deepMerge(data, parsedData);
+      } catch (ex) {
+        Ember.Resource.logger && typeof Ember.Resource.logger.error === "function" && Ember.Resource.logger.error(ex);
+      } finally {
+        Ember.endPropertyChanges();
+      }
     },
 
     willFetch: function() {},
@@ -1061,23 +1065,28 @@
 
         delete options.data;
 
-        Ember.beginPropertyChanges(instance);
-        var mixin = {};
-        var hasMixin = false;
-        for (var name in options) {
-          if (options.hasOwnProperty(name)) {
-            if (this.schema[name]) {
-              instance.set(name, options[name]);
-            } else {
-              mixin[name] = options[name];
-              hasMixin = true;
+        Ember.beginPropertyChanges();
+        try {
+          var mixin = {};
+          var hasMixin = false;
+          for (var name in options) {
+            if (options.hasOwnProperty(name)) {
+              if (this.schema[name]) {
+                instance.set(name, options[name]);
+              } else {
+                mixin[name] = options[name];
+                hasMixin = true;
+              }
             }
           }
+          if (hasMixin) {
+            instance.reopen(mixin);
+          }
+        } catch (ex) {
+          Ember.Resource.logger && typeof Ember.Resource.logger.error === "function" && Ember.Resource.logger.error(ex);
+        } finally {
+          Ember.endPropertyChanges();
         }
-        if (hasMixin) {
-          instance.reopen(mixin);
-        }
-        Ember.endPropertyChanges(instance);
 
         options.id = idToRestore;
         return instance;
