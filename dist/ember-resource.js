@@ -1356,11 +1356,15 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
     // Turn this resource into a JSON object to be saved via AJAX. Override
     // this method to produce different syncing behavior.
-    toJSON: function(fields) {
+    //
+    // Note: toJSON when called from within a collection iteration will receive several arguments,
+    // the first one being the index. Therefore we need to make some validation to be sure we are
+    // looking at a legitimate fields option before using it.
+    toJSON: function(options) {
       var json = {};
       var schemaItem, path, value;
       var schemaFields = Object.keys(this.constructor.schema);
-      var fieldsToSet = fields ? fields.filter(function(schemaField) {
+      var fieldsToSet = options && options.fields ? options.fields.filter(function(schemaField) {
         return schemaFields.indexOf(schemaField) !== -1;
       }) : schemaFields;
       fieldsToSet.forEach(function(name) {
@@ -1388,7 +1392,7 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
 
       var ajaxOptions = {
         contentType: 'application/json',
-        data: JSON.stringify(this.toJSON(options.fields)),
+        data: JSON.stringify(this.toJSON(options)),
         resource: this
       };
 
