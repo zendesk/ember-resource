@@ -1,3 +1,12 @@
+## 2.3.5 -- 2016-16-14
+
+* Fix for regression introduced in v2.3.3 (#123)
+
+## 2.3.4 -- 2016-06-13
+
+* Safe usage of Ember.beginPropertyChanges/Ember.endPropertyChanges (#122)
+* Publishing to artifactory under @zendesk scope (#121)
+
 ## 2.3.3 -- 2016-11-17
 
 * Allow specifying specific fields to be sent over the network when saving a resource (#120)

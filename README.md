@@ -2,9 +2,9 @@
 
 A simple library to connect your Ember.js application to JSON backends.
 
-* Current stable version: `2.3.3`
+* Current stable version: `2.3.5`
 * Download: \[[Development version][1]] \[[Minified version][2]]
-* CDN: `//cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.0.0/ember-resource.min.js`
+* CDN: `//cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.3.5/ember-resource.min.js`
 
 ## Ember Resource 2.0
 
@@ -212,7 +212,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-[1]: https://cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.0.0/ember-resource.js
-[2]: https://cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.0.0/ember-resource.min.js
+[1]: https://cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.3.5/ember-resource.js
+[2]: https://cdnjs.cloudflare.com/ajax/libs/ember-resource.js/2.3.5/ember-resource.min.js
 [3]: http://semver.org/
 [4]: https://github.com/zendesk/ember-resource/tree/2-0-stable
