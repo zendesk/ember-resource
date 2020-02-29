@@ -24,10 +24,20 @@ describe('Destroying resources', function() {
     beforeEach(function() {
       model = Model.create({id: 1});
       expect(Model.identityMap.get(1)).to.equal(model);
-      model.destroy();
     });
 
     it('should remove the object from the identity map', function() {
+      model.destroy();
+      expect(Model.identityMap.get(1)).to.be.undefined;
+    });
+
+    it('should not remove the object from the identity map when the instance if different', function() {
+      var otherModel = Model.create({id: 1, skipIdentityMap: true});
+
+      expect(otherModel).to.not.equal(model);
+      otherModel.destroy();
+      expect(Model.identityMap.get(1)).to.equal(model);
+      model.destroy();
       expect(Model.identityMap.get(1)).to.be.undefined;
     });
   });
