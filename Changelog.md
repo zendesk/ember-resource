@@ -1,3 +1,7 @@
+## 2.3.6 -- 2020-02-28
+
+* Only remove a resource from IdentityMap when it is the same instance (#125)
+
 ## 2.3.5 -- 2016-16-14
 
 * Fix for regression introduced in v2.3.3 (#123)
