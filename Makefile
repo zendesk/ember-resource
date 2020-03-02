@@ -2,7 +2,7 @@ DIST_JS = dist/ember-resource.js
 
 BROCCOLI   = ./node_modules/broccoli-cli/bin/broccoli
 JSHINT     = ./node_modules/jshint/bin/jshint
-PHANTOM_JS = ./node_modules/mocha-phantomjs/bin/mocha-phantomjs
+MOCHA-CHROME = ./node_modules/.bin/mocha-chrome
 
 dist: $(DIST_JS) $(JSHINT)
 	@$(JSHINT) $<
@@ -19,15 +19,15 @@ jshint: $(JSHINT)
 
 test: test-ember-current test-ember-next
 
-test-ember-current: jshint $(PHANTOM_JS)
-	$(PHANTOM_JS) spec/runner.html
+test-ember-current: jshint $(MOCHA-CHROME)
+	$(MOCHA-CHROME) spec/runner.html
 
-test-ember-next: jshint $(PHANTOM_JS)
-	$(PHANTOM_JS) spec/runner-next.html
+test-ember-next: jshint $(MOCHA-CHROME)
+	$(MOCHA-CHROME) spec/runner-next.html
 
 $(BROCCOLI): npm_install
 $(JSHINT): npm_install
-$(PHANTOM_JS): npm_install
+$(MOCHA-CHROME): npm_install
 
 npm_install:
 	npm install > /dev/null
