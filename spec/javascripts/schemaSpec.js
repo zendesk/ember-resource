@@ -174,7 +174,7 @@ describe('schema definition', function() {
     expect(getPath(instance, 'createdAt')).to.equal('');
 
     instance.updateWithApiData({ createdAt: null });
-    expect(getPath(instance, 'createdAt')).to.equal.null;
+    expect(getPath(instance, 'createdAt')).to.equal(null);
 
     instance.updateWithApiData({ createdAt: undefined });
     expect(getPath(instance, 'createdAt')).to.be.undefined;

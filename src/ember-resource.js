@@ -767,8 +767,12 @@
       },
 
       destroy: function() {
-        if (this.get('id') && this.constructor.identityMap) {
-          this.constructor.identityMap.remove(this.get('id'));
+        var id = this.get('id');
+
+        if (id && this.constructor.identityMap) {
+          if (this === this.constructor.identityMap.get(id)) {
+            this.constructor.identityMap.remove(id);
+          }
         }
         this._super();
       }
