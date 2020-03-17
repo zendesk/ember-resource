@@ -953,8 +953,8 @@
           self.updateWithApiData(data);
         }
 
-        self.didSave.call(self, {created: isCreate});
-        Ember.Resource.sendEvent(self, 'didSave', [{created: isCreate}]);
+        self.didSave.call(self, {created: isCreate, data: data});
+        Ember.Resource.sendEvent(self, 'didSave', [{created: isCreate, data: data}]);
 
       }).fail(function() {
         self.didFail.call(self);

@@ -1,3 +1,7 @@
+## 2.3.7 -- 2020-03-17
+
+* Pass returned data from save to didSave (#126)
+
 ## 2.3.6 -- 2020-02-28
 
 * Only remove a resource from IdentityMap when it is the same instance (#125)
