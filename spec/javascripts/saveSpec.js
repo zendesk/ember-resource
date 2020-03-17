@@ -146,7 +146,7 @@ describe('Saving a resource instance', function() {
       });
 
       it('should pass created: true to didSave', function() {
-        expect(resource.didSave.calledWith({created: true})).to.be.ok;
+        expect(resource.didSave.calledWith({created: true, data: {}})).to.be.ok;
       });
     });
 
@@ -160,7 +160,23 @@ describe('Saving a resource instance', function() {
       });
 
       it('should pass created: false to didSave', function() {
-        expect(resource.didSave.calledWith({created: false})).to.be.ok;
+        expect(resource.didSave.calledWith({created: false, data: {}})).to.be.ok;
+      });
+    });
+
+    describe('when saving a record', function() {
+      var response = { people: { name: 'foo'}};
+
+      beforeEach(function() {
+        server.respondWith('PUT', '/people/1', [200, {}, JSON.stringify(response)]);
+        resource = Model.create({ id: 1, name: 'foo' });
+        sinon.spy(resource, 'didSave');
+        resource.save();
+        server.respond();
+      });
+
+      it('should pass returned data to didSave', function() {
+        expect(resource.didSave.calledWith({created: false, data: response})).to.be.ok;
       });
     });
 
