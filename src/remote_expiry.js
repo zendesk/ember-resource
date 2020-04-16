@@ -15,9 +15,12 @@
       this._expiryCallback = null;
 
       if (this.get('remoteExpiryKey')) {
-        Ember.addListener(this, 'didFetch', this, function() {
-          self.subscribeForExpiry();
-        });
+        this._listenerHandlers = {
+          didFetch: function() {
+            this.subscribeForExpiry();
+          }
+        };
+        Ember.addListener(this, 'didFetch', this, this._listenerHandlers.didFetch);
       }
     },
 
@@ -40,6 +43,10 @@
 
     willDestroy: function() {
       var remoteExpiryScope = this.get('remoteExpiryKey');
+
+      if (this._listenerHandlers) {
+        Ember.removeListener(this, 'didFetch', this, this._listenerHandlers.didFetch);
+      }
 
       if (!remoteExpiryScope) {
         return;
