@@ -1,3 +1,7 @@
+## 2.3.8 -- 2020-04-16
+
+* Remove Ember listeners to prevent memory leaks (#127)
+
 ## 2.3.7 -- 2020-03-17
 
 * Pass returned data from save to didSave (#126)

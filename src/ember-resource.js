@@ -656,41 +656,43 @@
       init: function() {
         this._super.apply(this, arguments);
 
-        var self = this;
-
+        var resourceStateBeforeSave;
         var updateExpiry = function () {
           var expireAt = new Date();
-          expireAt.setSeconds(expireAt.getSeconds() + getPath(self, 'expireIn'));
-          set(self, 'expireAt', expireAt);
+          expireAt.setSeconds(expireAt.getSeconds() + getPath(this, 'expireIn'));
+          set(this, 'expireAt', expireAt);
         };
 
-        Ember.addListener(this, 'willFetch', this, function() {
-          set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHING);
-          updateExpiry();
-        });
-
-        Ember.addListener(this, 'didFetch', this, function() {
-          if(!getPath(self, 'hasBeenFetched')) {
-            set(self, 'hasBeenFetched', true);
+        this._listenerHandlers = {
+          willFetch: function() {
+            set(this, 'resourceState', Ember.Resource.Lifecycle.FETCHING);
+            updateExpiry.call(this);
+          },
+          didFetch: function() {
+            if(!getPath(this, 'hasBeenFetched')) {
+              set(this, 'hasBeenFetched', true);
+            }
+            set(this, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
+            updateExpiry.call(this);
+          },
+          didFail: function() {
+            set(this, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
+            updateExpiry.call(this);
+          },
+          willSave: function() {
+            resourceStateBeforeSave = getPath(this, 'resourceState');
+            set(this, 'resourceState', Ember.Resource.Lifecycle.SAVING);
+          },
+          didSave: function() {
+            set(this, 'resourceState', resourceStateBeforeSave || Ember.Resource.Lifecycle.UNFETCHED);
           }
-          set(self, 'resourceState', Ember.Resource.Lifecycle.FETCHED);
-          updateExpiry();
-        });
+        };
 
-        Ember.addListener(this, 'didFail', this, function() {
-          set(self, 'resourceState', Ember.Resource.Lifecycle.UNFETCHED);
-          updateExpiry();
-        });
-
-        var resourceStateBeforeSave;
-        Ember.addListener(this, 'willSave', this, function() {
-          resourceStateBeforeSave = getPath(self, 'resourceState');
-          set(self, 'resourceState', Ember.Resource.Lifecycle.SAVING);
-        });
-
-        Ember.addListener(this, 'didSave', this, function() {
-          set(self, 'resourceState', resourceStateBeforeSave || Ember.Resource.Lifecycle.UNFETCHED);
-        });
+        Ember.addListener(this, 'willFetch', this, this._listenerHandlers.willFetch);
+        Ember.addListener(this, 'didFetch', this, this._listenerHandlers.didFetch);
+        Ember.addListener(this, 'didFail', this, this._listenerHandlers.didFail);
+        Ember.addListener(this, 'willSave', this, this._listenerHandlers.willSave);
+        Ember.addListener(this, 'didSave', this, this._listenerHandlers.didSave);
       },
 
       isFetchable: Ember.computed(function(key) {
@@ -775,8 +777,15 @@
           }
         }
         this._super();
-      }
+      },
 
+      willDestroy: function() {
+        Ember.removeListener(this, 'willFetch', this, this._listenerHandlers.willFetch);
+        Ember.removeListener(this, 'didFetch', this, this._listenerHandlers.didFetch);
+        Ember.removeListener(this, 'didFail', this, this._listenerHandlers.didFail);
+        Ember.removeListener(this, 'willSave', this, this._listenerHandlers.willSave);
+        Ember.removeListener(this, 'didSave', this, this._listenerHandlers.didSave);
+      }
     })
   };
 
