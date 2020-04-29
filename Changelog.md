@@ -1,3 +1,7 @@
+## 2.3.9 -- 2020-04-29
+
+* Adding a `refetchOnExpiry` method to be overridable in subclasses (#128)
+
 ## 2.3.8 -- 2020-04-16
 
 * Remove Ember listeners to prevent memory leaks (#127)

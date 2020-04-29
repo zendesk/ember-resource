@@ -60,14 +60,18 @@
       this._super && this._super();
     },
 
+    refetchOnExpiry: function() {
+      this.expireNow();
+      this.fetch();
+    },
+
     updateExpiry: function(message) {
       var updatedAt = message && message.updatedAt;
       if (!updatedAt) return;
       if (this.stale(updatedAt)) {
         this.set('expiryUpdatedAt', updatedAt);
         if (this.get('remoteExpiryAutoFetch')) {
-          this.expireNow();
-          this.fetch();
+          this.refetchOnExpiry();
         } else {
           this.expire();
         }
