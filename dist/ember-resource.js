@@ -348,9 +348,9 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
       this._super && this._super();
     },
 
-    refetchOnExpiry: function() {
+    refetchOnExpiry: function(options) {
       this.expireNow();
-      this.fetch();
+      this.fetch(options);
     },
 
     updateExpiry: function(message) {
@@ -1414,11 +1414,13 @@ if (typeof this === 'object') this.LRUCache = LRUCache;
         return $.Deferred().reject(false);
       }
 
-      var ajaxOptions = {
+      var ajaxOptions = $.extend({}, options, {
         contentType: 'application/json',
         data: JSON.stringify(this.toJSON(options)),
         resource: this
-      };
+      });
+      // delete local options
+      delete ajaxOptions.update;
 
       var isCreate = getPath(this, 'isNew');
 

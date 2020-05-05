@@ -924,11 +924,13 @@
         return $.Deferred().reject(false);
       }
 
-      var ajaxOptions = {
+      var ajaxOptions = $.extend({}, options, {
         contentType: 'application/json',
         data: JSON.stringify(this.toJSON(options)),
         resource: this
-      };
+      });
+      // delete local options
+      delete ajaxOptions.update;
 
       var isCreate = getPath(this, 'isNew');
 
