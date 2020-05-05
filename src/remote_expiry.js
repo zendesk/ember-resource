@@ -60,9 +60,9 @@
       this._super && this._super();
     },
 
-    refetchOnExpiry: function() {
+    refetchOnExpiry: function(options) {
       this.expireNow();
-      this.fetch();
+      this.fetch(options);
     },
 
     updateExpiry: function(message) {
