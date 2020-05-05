@@ -1,3 +1,7 @@
+## 2.3.10 -- 2020-05-04
+
+* Pass down the save's and refetchOnExpiry's options to ajax  (#129)
+
 ## 2.3.9 -- 2020-04-29
 
 * Adding a `refetchOnExpiry` method to be overridable in subclasses (#128)
