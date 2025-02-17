@@ -1,0 +1,7 @@
+name: Malware Detection PR Scanner
+
+on: [pull_request]
+
+jobs:
+  scan-on-pr:
+    uses: zendesk/prodsec-actions/.github/workflows/malware-detection-pr-scanning.yaml@main
