@@ -1,0 +1,9 @@
+---
+description: Core project conventions
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Read and follow all instructions in the root `AGENTS.md` file.
+Read and follow all security requirements in `SECURITY.md`.
+See `ARCHITECTURE.md` for system architecture and design decisions.
